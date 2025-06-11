@@ -8,6 +8,7 @@ const port = process.env.PORT || 3000;
 
 const WAITER_SERVICE_URL = 'http://localhost:3001';
 const CHEF_SERVICE_URL = 'http://localhost:3002';
+const AUTH_SERVICE_URL = 'http://localhost:3003';
 
 const apiLimiter = rateLimit({
     windowMs: 1 * 60 * 1000, // 1 minutes
@@ -42,7 +43,7 @@ app.use('/chef', apiLimiter, apiThrottle, createProxyMiddleware({
 }));
 
 app.use('/auth', apiLimiter, apiThrottle, createProxyMiddleware({
-    target: 'http://localhost:3003',
+    target: AUTH_SERVICE_URL,
     changeOrigin: true,
     pathRewrite: {
         '^/auth': '',
