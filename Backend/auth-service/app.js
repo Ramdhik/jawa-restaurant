@@ -2,7 +2,7 @@ require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
-
+const auth = require('../shared/middlewares/middlewares'); // Tambahkan ini
 const app = express();
 const port = process.env.PORT || 3003;
 
@@ -11,7 +11,7 @@ app.use(bodyParser.json());
 
 // Routes
 const routerUser = require('./routes/userRoutes');
-app.use(routerUser);
+app.use(auth, routerUser);
 
 // Connect to MongoDB
 mongoose
