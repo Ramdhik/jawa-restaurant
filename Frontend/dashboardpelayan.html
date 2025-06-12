@@ -1,19 +1,25 @@
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Dashboard Pelayan</title>
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-gray-800 text-gray-900">
+
+<body class="bg-gray-800">
   <div class="max-w-screen-xl mx-auto bg-white shadow-md min-h-screen flex">
-    <!-- Sidebar -->
-    <div class="w-full p-6">
+    <!-- Main Content Area -->
+    <div class="w-2/3 p-6 border-r">
       <!-- Header -->
       <div class="flex items-center mb-4">
         <div class="w-12 h-12 rounded-full bg-gray-300 flex items-center justify-center text-white mr-4">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.121 17.804A11.954 11.954 0 0112 15c2.21 0 4.272.636 6.004 1.725M15 10a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-600" fill="none" viewBox="0 0 24 24"
+            stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M5.121 17.804A11.954 11.954 0 0112 15c2.21 0 4.272.636 6.004 1.725M15 10a3 3 0 11-6 0 3 3 0 016 0z" />
+          </svg>
         </div>
         <div>
           <h1 class="font-semibold text-lg">Budi Santoso</h1>
@@ -22,64 +28,26 @@
       </div>
 
       <!-- Order Cards -->
-      <div class="grid grid-cols-2 gap-4 mb-4">
-        <div class="border p-3 rounded shadow">
-          <p class="text-sm font-semibold">ORD-001</p>
-          <p class="text-sm text-gray-500">Meja 5</p>
-          <button class="mt-2 w-full bg-red-500 text-white py-1 rounded">Selesai</button>
-        </div>
-        <div class="border p-3 rounded shadow">
-          <p class="text-sm font-semibold">ORD-001</p>
-          <p class="text-sm text-gray-500">Meja 5</p>
-          <button class="mt-2 w-full bg-red-500 text-white py-1 rounded">Selesai</button>
-        </div>
+      <h2 class="font-semibold text-gray-700 text-md mb-2">Pesanan Aktif</h2>
+      <div id="order-cards-grid" class="grid grid-cols-3 gap-4 mb-4">
+        <!-- Kartu pesanan aktif akan dimuat di sini oleh JavaScript -->
       </div>
 
       <!-- Tabs -->
       <div class="mb-2">
         <div class="flex border-b border-gray-200 mb-4">
-          <button class="px-4 py-2 text-blue-600 border-b-2 border-blue-600 font-semibold">Makanan</button>
-          <button class="px-4 py-2 text-gray-600">Minuman</button>
+          <button class="menu-tab px-4 py-2 text-blue-600 border-b-2 border-blue-600 font-semibold"
+            data-category="Makanan Utama">Makanan</button>
+          <button class="menu-tab px-4 py-2 text-gray-500" data-category="Minuman">Minuman</button>
         </div>
       </div>
 
       <!-- Food Grid -->
-      <div class="grid grid-cols-4 gap-4 mb-4">
-        <div class="border rounded p-2 flex flex-col items-center">
-          <div class="w-full h-20 bg-gray-200 mb-2"></div>
-          <p class="text-sm">Nasi Goreng</p>
-        </div>
-        <div class="border rounded p-2 flex flex-col items-center">
-          <div class="w-full h-20 bg-gray-200 mb-2"></div>
-          <p class="text-sm">Nasi Goreng</p>
-        </div>
-        <div class="border rounded p-2 flex flex-col items-center">
-          <div class="w-full h-20 bg-gray-200 mb-2"></div>
-          <p class="text-sm">Nasi Goreng</p>
-        </div>
-        <div class="border rounded p-2 flex flex-col items-center">
-          <div class="w-full h-20 bg-gray-200 mb-2"></div>
-          <p class="text-sm">Nasi Goreng</p>
-        </div>
-        <div class="border rounded p-2 flex flex-col items-center">
-          <div class="w-full h-20 bg-gray-200 mb-2"></div>
-          <p class="text-sm">Nasi Goreng</p>
-        </div>
-        <div class="border rounded p-2 flex flex-col items-center">
-          <div class="w-full h-20 bg-gray-200 mb-2"></div>
-          <p class="text-sm">Nasi Goreng</p>
-        </div>
-        <div class="border rounded p-2 flex flex-col items-center">
-          <div class="w-full h-20 bg-gray-200 mb-2"></div>
-          <p class="text-sm">Nasi Goreng</p>
-        </div>
-        <div class="border rounded p-2 flex flex-col items-center">
-          <div class="w-full h-20 bg-gray-200 mb-2"></div>
-          <p class="text-sm">Nasi Goreng</p>
-        </div>
+      <div id="food-grid" class="grid grid-cols-4 gap-4 mb-4">
+        <!-- Kartu menu makanan akan dimuat di sini oleh JavaScript -->
       </div>
 
-      <!-- Pagination -->
+      <!-- Pagination (Statis untuk saat ini) -->
       <div class="flex justify-center space-x-2">
         <button class="px-3 py-1 border rounded bg-gray-100">Previous</button>
         <button class="px-3 py-1 border rounded bg-blue-500 text-white">1</button>
@@ -88,62 +56,299 @@
       </div>
     </div>
 
-    <!-- Order Summary -->
-    <div class="w-1/3 border-l p-6">
-      <h2 class="text-lg font-semibold mb-4">Pesanan</h2>
-
+    <!-- Order Summary Sidebar -->
+    <div class="w-1/3 p-6">
+      <h2 class="text-lg font-semibold mb-4">Buat Pesanan Baru</h2>
       <div class="mb-2">
-        <label class="block text-sm font-medium mb-1">Meja</label>
-        <select class="border px-3 py-1 rounded w-full">
+        <label class="block text-sm font-medium mb-1">Pilih Meja</label>
+        <select id="table-select" class="border px-3 py-1 rounded w-full">
+          <option>Meja 1</option>
+          <option>Meja 2</option>
+          <option>Meja 3</option>
+          <option>Meja 4</option>
           <option>Meja 5</option>
+          <option>Meja 6</option>
+          <option>Meja 7</option>
+          <option>Meja 8</option>
         </select>
       </div>
 
-      <div class="space-y-4 mb-4">
-        <!-- Item 1 -->
-        <div>
-          <div class="flex justify-between text-sm font-medium">
-            <p>Nasi Goreng</p>
-            <p>Rp. 70.000</p>
-          </div>
-          <div class="flex items-center mt-1 text-sm">
-            <button class="px-2 bg-gray-200 rounded">-</button>
-            <span class="mx-2">2</span>
-            <button class="px-2 bg-gray-200 rounded">+</button>
-          </div>
-        </div>
-
-        <!-- Item 2 -->
-        <div>
-          <div class="flex justify-between text-sm font-medium">
-            <p>Nasi Goreng</p>
-            <p>Rp. 35.000</p>
-          </div>
-          <div class="flex items-center mt-1 text-sm">
-            <button class="px-2 bg-gray-200 rounded">-</button>
-            <span class="mx-2">1</span>
-            <button class="px-2 bg-gray-200 rounded">+</button>
-          </div>
-        </div>
+      <div id="order-summary-items" class="space-y-4 mb-4 min-h-[200px] border-t border-b py-4">
+        <!-- Item pesanan akan dimuat di sini -->
+        <p class="text-gray-400 text-center">Klik menu untuk menambahkan...</p>
       </div>
 
       <!-- Total -->
       <div class="flex justify-between font-semibold text-base mb-4">
         <p>Total</p>
-        <p>Rp. 105.000</p>
+        <p id="order-total">Rp. 0</p>
       </div>
 
       <!-- Payment Method -->
       <div class="mb-4">
         <label class="block text-sm font-medium mb-1">Metode Pembayaran</label>
-        <select class="border px-3 py-1 rounded w-full">
+        <select id="payment-method-select" class="border px-3 py-1 rounded w-full">
           <option>Tunai</option>
+          <option>Kartu Debit/Kredit</option>
+          <option>QRIS</option>
+          <option>Transfer Bank</option>
         </select>
       </div>
 
       <!-- Pay Button -->
-      <button class="w-full bg-blue-500 text-white py-2 rounded text-lg">Bayar</button>
+      <button id="pay-button"
+        class="w-full bg-blue-500 text-white py-2 rounded text-lg hover:bg-blue-600">Buat
+        Pesanan</button>
     </div>
   </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      // === ELEMEN DOM ===
+      const foodGrid = document.querySelector('#food-grid');
+      const orderSummaryItems = document.querySelector('#order-summary-items');
+      const orderTotalElement = document.querySelector('#order-total');
+      const payButton = document.querySelector('#pay-button');
+      const tableSelect = document.querySelector('#table-select');
+      const orderCardsGrid = document.querySelector('#order-cards-grid');
+
+      // === STATE APLIKASI ===
+      let currentOrder = [];
+      let menuItems = [];
+      let activeCategory = 'Makanan Utama';
+
+      // === PENTING: GANTI ID INI DENGAN ID USER DARI DATABASE ANDA ===
+      const pelayanId = '68483fac6f7994567cc8f3ab';
+
+      // === FUNGSI-FUNGSI ===
+
+      // 1. Ambil data menu dari server
+      async function fetchMenu() {
+        try {
+          const response = await fetch('/waiter/menumakanans');
+          if (!response.ok) throw new Error('Gagal mengambil data menu');
+          menuItems = await response.json();
+          displayMenu();
+        } catch (error) {
+          console.error('Error fetching menu:', error);
+          foodGrid.innerHTML = '<p class="text-red-500 col-span-4">Gagal memuat menu.</p>';
+        }
+      }
+
+      // 2. Tampilkan menu di halaman
+      function displayMenu() {
+        foodGrid.innerHTML = '';
+        const filteredItems = menuItems.filter(item => item.kategori === activeCategory);
+
+        if (filteredItems.length === 0) {
+            foodGrid.innerHTML = `<p class="text-gray-400 col-span-4 text-center">Tidak ada item di kategori ini.</p>`;
+            return;
+        }
+
+        filteredItems.forEach(item => {
+          const card = document.createElement('div');
+          card.className = 'border rounded p-2 flex flex-col items-center cursor-pointer hover:shadow-lg transition-shadow';
+          card.innerHTML = `
+            <div class="w-full h-20 bg-gray-200 mb-2 bg-cover bg-center rounded-sm" style="background-image: url('${item.gambarUrl || 'https://via.placeholder.com/150'}')"></div>
+            <p class="text-sm font-semibold text-center">${item.nama}</p>
+            <p class="text-xs text-gray-500">Rp ${item.harga.toLocaleString('id-ID')}</p>
+          `;
+          card.addEventListener('click', () => addItemToOrder(item._id));
+          foodGrid.appendChild(card);
+        });
+      }
+      
+      // 3. Tambahkan item ke pesanan saat ini
+      function addItemToOrder(itemId) {
+        const menuItem = menuItems.find(m => m._id === itemId);
+        if (!menuItem) return;
+
+        const existingItem = currentOrder.find(item => item.menuItem === itemId);
+        if (existingItem) {
+          adjustQuantity({ target: { dataset: { itemId: itemId, action: 'increase' } } });
+        } else {
+          currentOrder.push({
+            menuItem: menuItem._id,
+            namaItem: menuItem.nama,
+            hargaSatuan: menuItem.harga,
+            kuantitas: 1,
+          });
+          updateOrderSummary();
+        }
+      }
+      
+      // 4. Update tampilan ringkasan pesanan
+      function updateOrderSummary() {
+        if (currentOrder.length === 0) {
+          orderSummaryItems.innerHTML = '<p class="text-gray-400 text-center">Klik menu untuk menambahkan...</p>';
+          orderTotalElement.textContent = 'Rp. 0';
+          return;
+        }
+
+        orderSummaryItems.innerHTML = '';
+        let totalHarga = 0;
+
+        currentOrder.forEach(item => {
+          const itemElement = document.createElement('div');
+          itemElement.className = 'py-2';
+          itemElement.innerHTML = `
+            <div class="flex justify-between text-sm font-medium">
+                <p>${item.namaItem}</p>
+                <p>Rp. ${(item.hargaSatuan * item.kuantitas).toLocaleString('id-ID')}</p>
+            </div>
+            <div class="flex items-center mt-1 text-sm">
+                <button class="adjust-qty-btn bg-gray-200 px-2 rounded hover:bg-gray-300" data-item-id="${item.menuItem}" data-action="decrease">-</button>
+                <span class="mx-2 w-5 text-center">${item.kuantitas}</span>
+                <button class="adjust-qty-btn bg-gray-200 px-2 rounded hover:bg-gray-300" data-item-id="${item.menuItem}" data-action="increase">+</button>
+            </div>
+          `;
+          orderSummaryItems.appendChild(itemElement);
+          totalHarga += item.hargaSatuan * item.kuantitas;
+        });
+
+        orderTotalElement.textContent = `Rp. ${totalHarga.toLocaleString('id-ID')}`;
+
+        document.querySelectorAll('.adjust-qty-btn').forEach(button => {
+          button.addEventListener('click', adjustQuantity);
+        });
+      }
+
+      // 5. Sesuaikan kuantitas item
+      function adjustQuantity(event) {
+        const button = event.target;
+        const itemId = button.dataset.itemId;
+        const action = button.dataset.action;
+        const orderItemIndex = currentOrder.findIndex(item => item.menuItem === itemId);
+
+        if (orderItemIndex > -1) {
+          if (action === 'increase') {
+            currentOrder[orderItemIndex].kuantitas++;
+          } else if (action === 'decrease') {
+            currentOrder[orderItemIndex].kuantitas--;
+            if (currentOrder[orderItemIndex].kuantitas === 0) {
+              currentOrder.splice(orderItemIndex, 1);
+            }
+          }
+        }
+        updateOrderSummary();
+      }
+
+      // 6. Kirim pesanan baru ke server
+      async function submitOrder() {
+        if (currentOrder.length === 0) {
+          alert('Keranjang pesanan kosong!');
+          return;
+        }
+        const orderData = {
+          pelayan: pelayanId,
+          meja: tableSelect.value,
+          items: currentOrder,
+          metodePembayaran: document.querySelector('#payment-method-select').value,
+        };
+        try {
+          const response = await fetch('/waiter/pesanans', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(orderData),
+          });
+          if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.message || 'Gagal membuat pesanan');
+          }
+          const newOrder = await response.json();
+          alert(`Pesanan ${newOrder.nomorPesanan} berhasil dibuat!`);
+          currentOrder = [];
+          updateOrderSummary();
+          fetchActiveOrders();
+        } catch (error) {
+          console.error('Error submitting order:', error);
+          alert(`Error: ${error.message}`);
+        }
+      }
+
+      // 7. Ambil pesanan yang aktif
+      async function fetchActiveOrders() {
+        try {
+          const response = await fetch('/chef/pesanans');
+          if (!response.ok) throw new Error('Gagal mengambil pesanan aktif');
+          const allOrders = await response.json();
+          const activeOrders = allOrders.filter(order => order.status !== 'Selesai');
+          displayActiveOrders(activeOrders);
+        } catch (error) {
+          console.error('Error fetching active orders:', error);
+          orderCardsGrid.innerHTML = '<p class="text-red-500 col-span-3">Gagal memuat pesanan aktif.</p>';
+        }
+      }
+
+      // 8. Tampilkan pesanan aktif
+      function displayActiveOrders(orders) {
+        orderCardsGrid.innerHTML = '';
+        if (orders.length === 0) {
+          orderCardsGrid.innerHTML = '<p class="text-gray-400 col-span-3">Tidak ada pesanan aktif.</p>';
+          return;
+        }
+        orders.forEach(order => {
+          const card = document.createElement('div');
+          card.className = 'border p-3 rounded shadow';
+          let statusClass = 'text-yellow-600'; // Pending
+          if (order.status === 'Sedang Diproses') statusClass = 'text-blue-600';
+          if (order.status === 'Siap Disajikan') statusClass = 'text-green-600';
+
+          card.innerHTML = `
+            <div class="flex justify-between items-center">
+                <p class="text-sm font-semibold">${order.nomorPesanan}</p>
+                <p class="text-xs font-bold ${statusClass}">${order.status}</p>
+            </div>
+            <p class="text-sm text-gray-500">${order.meja}</p>
+            <button class="complete-order-btn mt-2 w-full bg-red-500 text-white py-1 rounded hover:bg-red-600 text-sm">Selesaikan</button>
+          `;
+          card.querySelector('.complete-order-btn').addEventListener('click', () => completeOrder(order._id));
+          orderCardsGrid.appendChild(card);
+        });
+      }
+
+      // 9. Selesaikan pesanan
+      async function completeOrder(orderId) {
+        if (!confirm('Apakah Anda yakin ingin menyelesaikan pesanan ini?')) return;
+        try {
+          const response = await fetch(`/chef/pesanans/${orderId}`, {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ status: 'Selesai' })
+          });
+          if (!response.ok) throw new Error('Gagal menyelesaikan pesanan');
+          alert('Pesanan berhasil diselesaikan!');
+          fetchActiveOrders();
+        } catch (error) {
+          console.error('Error completing order:', error);
+          alert(`Error: ${error.message}`);
+        }
+      }
+      
+      // 10. Tangani klik pada tab
+      function handleTabClick(event) {
+          const clickedTab = event.currentTarget;
+          activeCategory = clickedTab.dataset.category;
+
+          document.querySelectorAll('.menu-tab').forEach(tab => {
+              tab.classList.remove('text-blue-600', 'border-blue-600', 'font-semibold');
+              tab.classList.add('text-gray-500');
+          });
+          clickedTab.classList.add('text-blue-600', 'border-blue-600', 'font-semibold');
+          clickedTab.classList.remove('text-gray-500');
+
+          displayMenu();
+      }
+
+      // === INISIALISASI HALAMAN ===
+      fetchMenu();
+      fetchActiveOrders();
+      payButton.addEventListener('click', submitOrder);
+      document.querySelectorAll('.menu-tab').forEach(tab => {
+          tab.addEventListener('click', handleTabClick);
+      });
+    });
+  </script>
 </body>
+
 </html>

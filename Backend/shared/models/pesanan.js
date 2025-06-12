@@ -59,8 +59,8 @@ const pesananSchema = new mongoose.Schema(
     },
     status: {
       type: String,
-      enum: ['Sedang Diproses', 'Siap Disajikan'],
-      default: 'Pending',
+      enum: ['Sedang Diproses', 'Siap Disajikan', 'Selesai'],
+      default: 'Sedang Diproses',
       required: true,
     },
     metodePembayaran: {
