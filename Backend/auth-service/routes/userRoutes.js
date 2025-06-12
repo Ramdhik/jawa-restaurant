@@ -40,7 +40,7 @@ router.get('/users', auth, async (req, res) => {
 });
 
 // GET user by ID
-router.get('/users/:id', async (req, res) => {
+router.get('/users/:id', auth, async (req, res) => {
   try {
     const user = await User.findById(req.params.id);
     if (!user) {
@@ -68,7 +68,7 @@ router.post('/users', async (req, res) => {
 });
 
 // PUT (update) user by ID
-router.put('/users/:id', async (req, res) => {
+router.put('/users/:id', auth, async (req, res) => {
   try {
     const user = await User.findByIdAndUpdate(req.params.id, req.body, { new: true, runValidators: true });
     if (!user) {
@@ -81,7 +81,7 @@ router.put('/users/:id', async (req, res) => {
 });
 
 // DELETE user by ID
-router.delete('/users/:id', async (req, res) => {
+router.delete('/users/:id', auth, async (req, res) => {
   try {
     const user = await User.findByIdAndDelete(req.params.id);
     if (!user) {
