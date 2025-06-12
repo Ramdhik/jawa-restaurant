@@ -2,10 +2,11 @@ const express = require('express');
 const { createProxyMiddleware } = require('http-proxy-middleware');
 const rateLimit = require('express-rate-limit');
 const throttle = require('express-slow-down');
+const config = require('../shared/config/config');
 
 const app = express();
 const path = require('path');
-const port = process.env.PORT || 3000;
+const port = config.API_GATEWAY_PORT;
 
 const WAITER_SERVICE_URL = 'http://localhost:3001';
 const CHEF_SERVICE_URL = 'http://localhost:3002';

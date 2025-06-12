@@ -1,9 +1,10 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
+const config = require('../shared/config/config');
 
 const app = express();
-const port = process.env.PORT || 3001;
+const port = config.WAITER_PORT;
 
 // Middleware
 app.use(bodyParser.json());
@@ -15,7 +16,7 @@ app.use(routerPesanan);
 app.use(routerMenuMakanan);
 
 // Connect to MongoDB
-mongoose.connect('mongodb+srv://baramora97:bara123@cluster0.lopfxb2.mongodb.net/restaurantDB', {
+mongoose.connect(config.MONGODB_URI, {
     // useNewUrlParser: true,
     // useUnifiedTopology: true,
 }).then(() => {
