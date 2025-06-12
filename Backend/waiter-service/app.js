@@ -1,6 +1,7 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
+const auth = require('../shared/middlewares/middlewares'); // Tambahkan ini
 const config = require('../shared/config/config');
 
 const app = express();
@@ -12,20 +13,23 @@ app.use(bodyParser.json());
 // Routes
 const routerMenuMakanan = require('./routes/menuMakananRoutes');
 const routerPesanan = require('./routes/pesananRoutes');
-app.use(routerPesanan);
-app.use(routerMenuMakanan);
+app.use(auth, routerPesanan);
+app.use(auth, routerMenuMakanan);
 
 // Connect to MongoDB
-mongoose.connect(config.MONGODB_URI, {
+mongoose
+  .connect(config.MONGODB_URI, {
     // useNewUrlParser: true,
     // useUnifiedTopology: true,
-}).then(() => {
+  })
+  .then(() => {
     console.log('Connected to MongoDB');
-}).catch((error) => {
+  })
+  .catch((error) => {
     console.error('Error connecting to MongoDB:', error);
-});
+  });
 
 // Start the server
 app.listen(port, () => {
-    console.log(`Waiter Service listening on port ${port}`);
+  console.log(`Waiter Service listening on port ${port}`);
 });

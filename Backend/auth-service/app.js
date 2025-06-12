@@ -1,6 +1,7 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
+const auth = require('../shared/middlewares/middlewares');
 const config = require('../shared/config/config');
 
 const app = express();
@@ -11,7 +12,7 @@ app.use(bodyParser.json());
 
 // Routes
 const routerUser = require('./routes/userRoutes');
-app.use(routerUser);
+app.use(auth, routerUser);
 
 // Connect to MongoDB
 mongoose
