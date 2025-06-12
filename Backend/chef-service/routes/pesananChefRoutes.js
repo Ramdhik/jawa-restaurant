@@ -42,6 +42,6 @@ router.patch('/pesanans/:id', async (req, res) => {
   } catch (error) {
     res.status(400).send(error);
   }
-})
+});
 
 module.exports = router;

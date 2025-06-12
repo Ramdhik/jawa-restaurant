@@ -4,6 +4,7 @@ const rateLimit = require('express-rate-limit');
 const throttle = require('express-slow-down');
 
 const app = express();
+const path = require('path');
 const port = process.env.PORT || 3000;
 
 const WAITER_SERVICE_URL = 'http://localhost:3001';
@@ -25,6 +26,8 @@ const apiThrottle = throttle({
         return (used - req.slowDown.limit) * 500; // 500ms per request
     },
 });
+
+app.use(express.static(path.join(__dirname, '../../Frontend')));
 
 app.use('/waiter', apiLimiter, apiThrottle, createProxyMiddleware({
     target: WAITER_SERVICE_URL,
