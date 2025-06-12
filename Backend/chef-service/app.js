@@ -17,7 +17,7 @@ app.use(bodyParser.json());
 
 // Routes
 const routerPesananChef = require('./routes/pesananChefRoutes');
-app.use('/chef', auth, routerPesananChef); // Proteksi route dengan auth
+app.use(auth, routerPesananChef); // Proteksi route dengan auth
 
 // Connect to MongoDB
 mongoose

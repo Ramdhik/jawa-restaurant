@@ -28,9 +28,8 @@ router.post('/login', async (req, res) => {
 });
 
 // GET all users
-const auth = require('../../shared/middlewares/middlewares');
 
-router.get('/users', auth, async (req, res) => {
+router.get('/users', async (req, res) => {
   try {
     const users = await User.find({});
     res.status(200).send(users);
