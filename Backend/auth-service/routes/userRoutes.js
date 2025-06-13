@@ -28,7 +28,6 @@ router.post('/login', async (req, res) => {
 });
 
 // GET all users
-
 router.get('/users', async (req, res) => {
   try {
     const users = await User.find({});

@@ -3,6 +3,8 @@ const { createProxyMiddleware } = require('http-proxy-middleware');
 const rateLimit = require('express-rate-limit');
 const throttle = require('express-slow-down');
 const config = require('../shared/config/config');
+const cors = require('cors');
+const cookieParser = require('cookie-parser');
 
 const app = express();
 const path = require('path');
@@ -28,6 +30,15 @@ const apiThrottle = throttle({
     },
 });
 
+const authCorsOptions = {
+  origin: 'http://localhost:5500', // Frontend Anda
+  methods: ['GET', 'HEAD', 'PUT', 'PATCH', 'POST', 'DELETE'],
+  credentials: true,
+  optionsSuccessStatus: 204
+};
+
+app.use(cors(authCorsOptions));
+app.use(cookieParser());
 app.use(express.static(path.join(__dirname, '../../Frontend')));
 
 app.use('/waiter', apiLimiter, apiThrottle, createProxyMiddleware({

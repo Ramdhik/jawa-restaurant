@@ -16,7 +16,7 @@ const userSchema = new mongoose.Schema(
     },
     password: {
       type: String,
-      required: [true, 'Password harus diisi.'],
+      required: [false, 'Password harus diisi.'],
       minlength: [6, 'Password minimal 6 karakter.'],
     },
     email: {
@@ -41,6 +41,16 @@ const userSchema = new mongoose.Schema(
       type: Boolean,
       default: true,
     },
+    googleId: {
+      type: String,
+      unique: true,
+      sparse: true,
+      trim: true,
+    },
+    isProfileComplete: {
+      type: Boolean,
+      default: false,
+    }
   },
   {
     timestamps: true,
