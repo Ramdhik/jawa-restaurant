@@ -11,21 +11,21 @@
   <div class="bg-white p-8 rounded-md shadow-md w-full max-w-sm text-center">
     <h2 class="text-xl font-semibold mb-6">Register</h2>
 
-    <form class="space-y-3 text-left">
+    <form id="register1-form" class="space-y-3 text-left">
 
-      <input type="text" placeholder="Nama Lengkap" class="w-full px-4 py-2 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"/>
+      <input id="namaLengkap" type="text" placeholder="Nama Lengkap" class="w-full px-4 py-2 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"/>
 
-      <input type="text" placeholder="Username" class="w-full px-4 py-2 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"/>
+      <input id="username" type="text" placeholder="Username" class="w-full px-4 py-2 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"/>
 
-      <input type="text" placeholder="No. Telepon" class="w-full px-4 py-2 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"/>
+      <input id="telepon" type="text" placeholder="No. Telepon" class="w-full px-4 py-2 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"/>
 
-      <input type="email" placeholder="Email@domain.com" class="w-full px-4 py-2 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"/>
+      <input id="email" type="email" placeholder="Email@domain.com" class="w-full px-4 py-2 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"/>
 
-      <input type="password" placeholder="Password" class="w-full px-4 py-2 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"/>
+      <input id="password" type="password" placeholder="Password" class="w-full px-4 py-2 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"/>
 
-      <input type="password" placeholder="Confirm Password" class="w-full px-4 py-2 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"/>
+      <input id="confirmPassword" type="password" placeholder="Confirm Password" class="w-full px-4 py-2 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"/>
 
-      <select class="w-full px-4 py-2 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-400">
+      <select id="role" class="w-full px-4 py-2 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-400">
         <option>Pelayan</option>
         <option>Chef</option>
       </select>
@@ -34,6 +34,53 @@
 
     </form>
   </div>
+
+  <script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const registerForm = document.querySelector('#register1-form');
+
+    registerForm.addEventListener('submit', async (event) => {
+      event.preventDefault(); // Mencegah form mengirim data secara default
+
+      const namaLengkap = document.querySelector('#namaLengkap').value;
+      const username = document.querySelector('#username').value;
+      const telepon = document.querySelector('#telepon').value;
+      const email = document.querySelector('#email').value;
+      const password = document.querySelector('#password').value;
+      const confirmPassword = document.querySelector('#confirmPassword').value;
+      const role = document.querySelector('#role').value;
+
+      if (password !== confirmPassword) {
+        alert('Password dan konfirmasi password tidak cocok!');
+        return;
+      }
+
+      const userData = { namaLengkap, username, telepon, email, password, role };
+
+      try {
+        // Request ke API Gateway, bukan langsung ke auth-service
+        const response = await fetch('/auth/users', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(userData)
+        });
+
+        const result = await response.json();
+
+        if (!response.ok) {
+          throw new Error(result.message || 'Gagal mendaftar');
+        }
+
+        alert('Pendaftaran berhasil! Silakan login.');
+        window.location.href = '/loginpage.html'; // Arahkan ke halaman login
+
+      } catch (error) {
+        console.error('Error saat mendaftar:', error);
+        alert(`Error: ${error.message}`);
+      }
+    });
+  });
+</script>
 
 </body>
 </html>

@@ -10,21 +10,21 @@
 
   <div class="bg-white p-8 rounded-md shadow-md w-full max-w-sm text-center">
     <h2 class="text-xl font-semibold mb-6">Sign in</h2>
-
+    <form id="login-form">
     <!-- Email Input -->
-    <input type="email" placeholder="email@domain.com"
+    <input id="email" type="email" placeholder="email@domain.com"
            class="w-full px-4 py-2 border border-gray-300 rounded mb-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"/>
 
     <!-- Password Input -->
-    <input type="password" placeholder="Password"
+    <input id="password" type="password" placeholder="Password"
            class="w-full px-4 py-2 border border-gray-300 rounded mb-4 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"/>
 
     <!-- Login Button -->
     <button class="w-full bg-gray-700 text-white py-2 rounded mb-3 hover:bg-gray-800">Login</button>
-
+    </form>
     <!-- Create Account -->
     <p class="text-sm">Don't have an account?
-      <a href="#" class="text-blue-500 hover:underline">Create account</a>
+      <a href="/register1.html" class="text-blue-500 hover:underline">Create account</a>
     </p>
 
     <!-- Divider -->
@@ -35,11 +35,71 @@
     </div>
 
     <!-- Google Button -->
+    <a href="/register2.html">
     <button class="flex items-center justify-center w-full bg-blue-100 hover:bg-blue-200 text-sm text-gray-700 py-2 rounded">
       <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" class="w-5 h-5 mr-2">
       Continue with Google
     </button>
+    </a>
   </div>
+
+  <script>
+  document.addEventListener('DOMContentLoaded', () => {
+    // Cek jika sudah login, langsung arahkan
+    const token = localStorage.getItem('token');
+    const userRole = localStorage.getItem('userRole');
+    if (token && userRole) {
+        if (userRole === 'Pelayan') {
+            window.location.href = '/dashboardpelayan.html';
+        } else if (userRole === 'Chef') {
+            window.location.href = '/dashboardchef.html';
+        }
+    }
+
+    const loginForm = document.querySelector('#login-form');
+    loginForm.addEventListener('submit', async (event) => {
+      event.preventDefault();
+
+      const username = document.querySelector('#username').value;
+      const password = document.querySelector('#password').value;
+
+      try {
+        const response = await fetch('/auth/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username, password })
+        });
+
+        const result = await response.json();
+
+        if (!response.ok) {
+          throw new Error(result.message || 'Login gagal');
+        }
+
+        // Simpan token dan data user di localStorage
+        localStorage.setItem('token', result.token);
+        localStorage.setItem('userId', result.user.id);
+        localStorage.setItem('username', result.user.username);
+        localStorage.setItem('userRole', result.user.role);
+
+        alert('Login berhasil!');
+
+        // Arahkan berdasarkan role
+        if (result.user.role === 'Pelayan') {
+          window.location.href = '/dashboardpelayan.html';
+        } else if (result.user.role === 'Chef') {
+          window.location.href = '/dashboardchef.html';
+        } else {
+          alert('Role tidak dikenali.');
+        }
+
+      } catch (error) {
+        console.error('Error saat login:', error);
+        alert(`Error: ${error.message}`);
+      }
+    });
+  });
+</script>
 
 </body>
 </html>
