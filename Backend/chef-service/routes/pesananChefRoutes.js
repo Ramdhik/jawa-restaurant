@@ -1,5 +1,5 @@
 const express = require('express');
-const Pesanan = require('../../shared/models/pesanan'); // Import the Pesanan model
+const Pesanan = require('../models/pesanan'); // Import the Pesanan model
 const router = express.Router();
 
 // GET all orders

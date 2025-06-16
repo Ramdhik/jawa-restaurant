@@ -1,0 +1,19 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: chef-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: chef-service
+  template:
+    metadata:
+      labels:
+        app: chef-service
+    spec:
+      containers:
+        - name: chef-service
+          image: luviandsp/chef-service:v1 # Ganti dengan image Docker Chef Service Anda
+          ports:
+            - containerPort: 3002

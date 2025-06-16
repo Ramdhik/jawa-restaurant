@@ -1,8 +1,9 @@
 const express = require('express');
-const User = require('../../shared/models/user');
+const User = require('../user');
 const router = express.Router();
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const auth = require('../middlewares');
 
 // POST login user
 router.post('/login', async (req, res) => {
@@ -28,7 +29,7 @@ router.post('/login', async (req, res) => {
 });
 
 // GET all users
-router.get('/users', async (req, res) => {
+router.get('/users', auth, async (req, res) => {
   try {
     const users = await User.find({});
     res.status(200).send(users);
@@ -38,7 +39,7 @@ router.get('/users', async (req, res) => {
 });
 
 // GET user by ID
-router.get('/users/:id', async (req, res) => {
+router.get('/users/:id', auth, async (req, res) => {
   try {
     const user = await User.findById(req.params.id);
     if (!user) {
@@ -66,7 +67,7 @@ router.post('/users', async (req, res) => {
 });
 
 // PUT (update) user by ID
-router.put('/users/:id', async (req, res) => {
+router.put('/users/:id', auth, async (req, res) => {
   try {
     const user = await User.findByIdAndUpdate(req.params.id, req.body, { new: true, runValidators: true });
     if (!user) {
@@ -79,7 +80,7 @@ router.put('/users/:id', async (req, res) => {
 });
 
 // DELETE user by ID
-router.delete('/users/:id', async (req, res) => {
+router.delete('/users/:id', auth, async (req, res) => {
   try {
     const user = await User.findByIdAndDelete(req.params.id);
     if (!user) {

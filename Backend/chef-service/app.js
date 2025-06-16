@@ -1,16 +1,17 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
-const config = require('../shared/config/config');
+const path = require('path');
+require('dotenv').config({ path: path.resolve(__dirname, '.env') });
 
-require('../shared/models/pesanan');
-require('../shared/models/user');
-require('../shared/models/menuMakanan');
+require('./models/pesanan');
+require('./models/user');
+require('./models/menuMakanan');
 
-const auth = require('../shared/middlewares/middlewares'); // Tambahkan ini
+const auth = require('./middlewares'); // Tambahkan ini
 
 const app = express();
-const port = config.CHEF_PORT;
+const port = process.env.CHEF_PORT;
 
 // Middleware
 app.use(bodyParser.json());
@@ -21,7 +22,7 @@ app.use(auth, routerPesananChef); // Proteksi route dengan auth
 
 // Connect to MongoDB
 mongoose
-  .connect(config.MONGODB_URI, {
+  .connect(process.env.MONGODB_URI, {
     // useNewUrlParser: true,
     // useUnifiedTopology: true,
   })

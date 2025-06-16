@@ -1,12 +1,11 @@
 const express = require('express');
 const router = express.Router();
-const config = require('../../shared/config/config');
-const User = require('../../shared/models/user');
+const User = require('../user');
 const session = require('express-session');
 const passport = require('passport');
 const googleStrategy = require('passport-google-oauth20').Strategy;
 const jwt = require('jsonwebtoken');
-const authenticateJWT = require('../../shared/middlewares/middlewares');
+const authenticateJWT = require('../middlewares');
 
 // Middleware
 router.use(session({
@@ -21,9 +20,9 @@ router.use(passport.session());
 
 // Google authentication
 passport.use(new googleStrategy({
-    clientID: config.GOOGLE_CLIENT_ID,
-    clientSecret: config.GOOGLE_CLIENT_SECRET,
-    callbackURL: config.GOOGLE_REDIRECT_URI,
+    clientID: process.env.GOOGLE_CLIENT_ID,
+    clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+    callbackURL: process.env.GOOGLE_REDIRECT_URI,
 }, async (accessToken, refreshToken, profile, done) => { 
     try {
         let user = await User.findOne({ googleId: profile.id });
@@ -87,17 +86,16 @@ router.get('/google/callback',
             namaLengkap: user.namaLengkap
         };
 
-        const token = jwt.sign(payload, config.JWT_SECRET, { expiresIn: '1h' });
+        const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '1h' });
 
         // Kirim JWT ke frontend (via cookie atau JSON)
         res.cookie('jwt', token, {
-            httpOnly: true,
             secure: false,
             sameSite: 'Lax',
             maxAge: 3600000 // 1 jam
         });
 
-        console.log('Token:', token);
+        console.log('Token OAuth:', token);
 
         if (!user.isProfileComplete) {
             // Redirect ke halaman pendaftaran frontend
@@ -174,13 +172,13 @@ router.post('/complete-profile', authenticateJWT, async (req, res) => {
 
         console.log('Payload:', payload);
 
-        const newToken = jwt.sign(payload, config.JWT_SECRET, { expiresIn: '1h' });
+        const newToken = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '1h' });
 
         console.log('New Token:', newToken);
 
         // Kirim JWT baru ke frontend (via cookie atau JSON)
         res.cookie('jwt', newToken, {
-            httpOnly: true,
+
             secure: false,
             sameSite: 'None',
             maxAge: 3600000

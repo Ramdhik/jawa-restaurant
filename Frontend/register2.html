@@ -32,6 +32,18 @@
     const teleponInput = document.getElementById('telepon');
     const roleSelect = document.getElementById('role');
 
+        // Fungsi untuk mendapatkan nilai cookie berdasarkan nama
+    function getCookie(name) {
+        const nameEQ = name + "=";
+        const ca = document.cookie.split(';');
+        for (let i = 0; i < ca.length; i++) {
+            let c = ca[i];
+            while (c.charAt(0) === ' ') c = c.substring(1, c.length);
+            if (c.indexOf(nameEQ) === 0) return c.substring(nameEQ.length, c.length);
+        }
+        return null;
+    }
+
     // Ambil ID pengguna dari URL (misalnya: http://127.0.0.1:5500/Frontend/register2.html?userId=someId)
     const urlParams = new URLSearchParams(window.location.search);
     const userIdFromUrl = urlParams.get('userId'); // Ini adalah ID user yang baru login via Google
@@ -58,11 +70,19 @@
       };
 
       try {
+        const jwtToken = getCookie('jwt');
+
+        if (!jwtToken) {
+            alert('Token autentikasi tidak ditemukan. Silakan login kembali.');
+            return;
+        }
+
         // URL endpoint API Gateway yang mengarah ke auth-service
         const response = await fetch('http://localhost:3000/auth/complete-profile', {
           method: 'POST',
           headers: {
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + jwtToken
           },
           body: JSON.stringify(data)
         });

@@ -1,0 +1,19 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: api-gateway
+spec:
+  replicas: 1 # Atau sesuaikan dengan kebutuhan Anda
+  selector:
+    matchLabels:
+      app: api-gateway
+  template:
+    metadata:
+      labels:
+        app: api-gateway
+    spec:
+      containers:
+        - name: api-gateway
+          image: luviandsp/api-gateway:v1 # Ganti dengan image Docker API Gateway Anda
+          ports:
+            - containerPort: 3000 # Port yang digunakan aplikasi API Gateway di dalam kontainer
