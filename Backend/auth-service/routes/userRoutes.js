@@ -24,6 +24,7 @@ router.post('/login', async (req, res) => {
       user: { id: user._id, username: user.username, role: user.role },
     });
   } catch (err) {
+    console.error('error', err);
     res.status(500).json({ message: 'Server error', error: err.message });
   }
 });
@@ -62,6 +63,7 @@ router.post('/users', async (req, res) => {
     await user.save();
     res.status(201).send(user);
   } catch (error) {
+    console.error('Error creating user:', error);
     res.status(400).send(error);
   }
 });
@@ -75,6 +77,7 @@ router.put('/users/:id', auth, async (req, res) => {
     }
     res.status(200).send(user);
   } catch (error) {
+    console.error('Error updating user:', error);
     res.status(400).send(error);
   }
 });
@@ -88,6 +91,7 @@ router.delete('/users/:id', auth, async (req, res) => {
     }
     res.status(200).send({ message: 'User deleted successfully' });
   } catch (error) {
+    console.error('Error deleting user:', error);
     res.status(500).send(error);
   }
 });

@@ -12,7 +12,7 @@ const port = process.env.AUTH_PORT;
 // Middleware
 // Pastikan ini ada dan DITERAPKAN SEBELUM rute Anda
 const authCorsOptions = {
-  origin: 'http://localhost:5500', // HARUS SAMA PERSIS dengan origin frontend Anda
+  origin: ['http://localhost:5500', 'http://127.0.0.1:5500'], // HARUS SAMA PERSIS dengan origin frontend Anda
   methods: ['GET', 'HEAD', 'PUT', 'PATCH', 'POST', 'DELETE'],
   credentials: true, // SANGAT PENTING
   optionsSuccessStatus: 204

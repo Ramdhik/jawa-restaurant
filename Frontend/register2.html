@@ -24,6 +24,9 @@
 </div>
 
 <script>
+
+  const FRONTEND_BASE_URL = 'http://127.0.0.1:5500';
+
   document.addEventListener('DOMContentLoaded', () => {
     // Pastikan ID ini cocok dengan ID di elemen HTML di atas
     const form = document.getElementById('completeProfileForm');
@@ -78,7 +81,7 @@
         }
 
         // URL endpoint API Gateway yang mengarah ke auth-service
-        const response = await fetch('http://localhost:3000/auth/complete-profile', {
+        const response = await fetch('http://localhost:30000/auth/complete-profile', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -94,7 +97,11 @@
           alert(result.message + '\nSelamat datang, ' + result.user.namaLengkap + '!');
           // Redirect ke halaman dashboard atau beranda setelah profil lengkap
           // Pastikan URL ini sesuai dengan URL dashboard di frontend Anda
-          window.location.href = 'http://127.0.0.1:5500/Frontend/dashboard.html';
+            if (result.user.role === 'Pelayan') {
+              window.location.href = `${FRONTEND_BASE_URL}/Frontend/dashboardpelayan.html?userId=${result.user._id}`;
+            } else {
+              window.location.href = `${FRONTEND_BASE_URL}/Frontend/dashboardchef.html?userId=${result.user._id}`;
+            }
         } else {
           alert('Gagal menyimpan profil: ' + result.message);
         }

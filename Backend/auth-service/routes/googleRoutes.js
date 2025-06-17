@@ -102,7 +102,11 @@ router.get('/google/callback',
             return res.redirect(`http://localhost:5500/Frontend/register2.html?userId=${user._id}`);
         } else {
             // Redirect ke halaman profil atau dashboard utama jika sudah lengkap
-            return res.redirect('/auth/profile'); // Atau ke URL dashboard frontend Anda
+            if (user.role === 'Pelayan') {
+                return res.redirect(`http://localhost:5500/Frontend/dashboardpelayan.html?userId=${user._id}`); // Atau ke URL dashboard frontend Anda
+            } else if (user.role === 'Chef') {
+                return res.redirect(`http://localhost:5500/Frontend/dashboardchef.html?userId=${user._id}`); // Atau ke URL dashboard frontend Anda
+            }
         }
     }
 );

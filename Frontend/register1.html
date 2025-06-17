@@ -13,27 +13,148 @@
 
     <form class="space-y-3 text-left">
 
-      <input type="text" placeholder="Nama Lengkap" class="w-full px-4 py-2 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"/>
+      <input id="namaLengkap" type="text" placeholder="Nama Lengkap" class="w-full px-4 py-2 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"/>
 
-      <input type="text" placeholder="Username" class="w-full px-4 py-2 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"/>
+      <input id="username" type="text" placeholder="Username" class="w-full px-4 py-2 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"/>
 
-      <input type="text" placeholder="No. Telepon" class="w-full px-4 py-2 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"/>
+      <input id="telepon" type="text" placeholder="No. Telepon" class="w-full px-4 py-2 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"/>
 
-      <input type="email" placeholder="Email@domain.com" class="w-full px-4 py-2 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"/>
+      <input id="email" type="email" placeholder="Email@domain.com" class="w-full px-4 py-2 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"/>
 
-      <input type="password" placeholder="Password" class="w-full px-4 py-2 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"/>
+      <input id="password" type="password" placeholder="Password" class="w-full px-4 py-2 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"/>
 
-      <input type="password" placeholder="Confirm Password" class="w-full px-4 py-2 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"/>
+      <input id="confirmPassword" type="password" placeholder="Confirm Password" class="w-full px-4 py-2 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"/>
 
-      <select class="w-full px-4 py-2 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-400">
+      <select id="role" class="w-full px-4 py-2 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-400">
         <option>Pelayan</option>
         <option>Chef</option>
       </select>
 
-      <button type="submit" class="w-full bg-gray-700 text-white py-2 rounded hover:bg-gray-800 mt-2">Sign Up</button>
+      <button id="signupButton" type="submit" class="w-full bg-gray-700 text-white py-2 rounded hover:bg-gray-800 mt-2">Sign Up</button>
 
     </form>
   </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        console.log('Register page script loaded.');
+
+        // 1. Ambil elemen DOM
+        const namaLengkapInput = document.getElementById('namaLengkap');
+        const usernameInput = document.getElementById('username');
+        const teleponInput = document.getElementById('telepon');
+        const emailInput = document.getElementById('email');
+        const passwordInput = document.getElementById('password');
+        const confirmPasswordInput = document.getElementById('confirmPassword');
+        const roleSelect = document.getElementById('role');
+        const signupButton = document.getElementById('signupButton');
+
+        // --- Konfigurasi URL API Gateway ---
+        // Sesuaikan ini nanti saat deploy ke Kubernetes atau cloud
+        const API_GATEWAY_BASE_URL = 'http://localhost:30000'; // Untuk testing lokal
+        // const API_GATEWAY_BASE_URL = 'https://api.domainanda.com'; // Contoh untuk produksi
+
+        // URL untuk redirect setelah sukses register (misalnya ke halaman login)
+        const LOGIN_PAGE_URL = 'http://localhost:5500/Frontend/loginpage.html'; // Sesuaikan jika frontend di-deploy
+        // ------------------------------------
+
+        console.log('API_GATEWAY_BASE_URL:', API_GATEWAY_BASE_URL);
+
+        // 2. Tambahkan event listener ke form (lebih baik ke form daripada tombol submit)
+        signupButton.addEventListener('click', async (e) => {
+            e.preventDefault(); // Mencegah form untuk refresh halaman
+            console.log('Register form submitted.');
+
+            // 3. Ambil nilai dari input
+            const namaLengkap = namaLengkapInput.value.trim();
+            const username = usernameInput.value.trim();
+            const telepon = teleponInput.value.trim();
+            const email = emailInput.value.trim();
+            const password = passwordInput.value.trim();
+            const confirmPassword = confirmPasswordInput.value.trim();
+            const role = roleSelect.value;
+
+            console.log('Nama Lengkap:', namaLengkap);
+            console.log('Username:', username);
+            console.log('No. Telepon:', telepon);
+            console.log('Email:', email);
+            console.log('Password:', password ? '*****' : '[empty]'); // Hindari log password asli
+            console.log('Confirm Password:', confirmPassword ? '*****' : '[empty]');
+            console.log('Role:', role);
+
+            // 4. Validasi di sisi frontend
+            if (!namaLengkap || !username || !telepon || !email || !password || !confirmPassword) {
+                alert('Semua field wajib diisi!');
+                console.warn('Validation failed: All fields are required.');
+                return;
+            }
+
+            if (password !== confirmPassword) {
+                alert('Konfirmasi password tidak cocok dengan password!');
+                console.warn('Validation failed: Passwords do not match.');
+                return;
+            }
+
+            if (password.length < 6) { // Contoh: minimal 6 karakter
+                alert('Password minimal 6 karakter!');
+                console.warn('Validation failed: Password too short.');
+                return;
+            }
+
+            // Validasi format email sederhana
+            if (!/\S+@\S+\.\S+/.test(email)) {
+                alert('Format email tidak valid!');
+                console.warn('Validation failed: Invalid email format.');
+                return;
+            }
+
+            // 5. Buat objek data untuk dikirim ke backend
+            const data = {
+                namaLengkap: namaLengkap,
+                username: username,
+                telepon: telepon,
+                email: email,
+                password: password,
+                role: role,
+                isProfileComplete: true // Atur ini ke true jika semua data di sini dianggap lengkap
+            };
+
+            // 6. Kirim data ke backend menggunakan Fetch API
+            try {
+                console.log('Sending registration request to:', `${API_GATEWAY_BASE_URL}/users`);
+                console.log('Request payload:', data); // Log payload untuk debugging
+
+                const response = await fetch(`${API_GATEWAY_BASE_URL}/auth/users`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                    },
+                    body: JSON.stringify(data),
+                });
+
+                console.log('Raw response from /users:', response);
+
+                const result = await response.json();
+                console.log('Parsed result from /users:', result);
+
+                if (response.ok) { // Status 2xx
+                    alert('Registrasi berhasil! Silakan login.');
+                    console.log('Registration successful. Redirecting to login page...');
+                    window.location.href = LOGIN_PAGE_URL; // Redirect ke halaman login
+                } else {
+                    // Penanganan error dari backend (misalnya, username/email sudah terdaftar)
+                    const errorMessage = result.message || JSON.stringify(result);
+                    alert('Registrasi gagal: ' + errorMessage);
+                    console.error('Registration failed. Server response not OK:', response.status, result);
+                }
+            } catch (error) {
+                console.error('Terjadi kesalahan jaringan atau server:', error);
+                alert('Terjadi kesalahan saat berkomunikasi dengan server.');
+            }
+        });
+    });
+  </script>
 
 </body>
 </html>
