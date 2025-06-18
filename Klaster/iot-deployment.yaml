@@ -1,0 +1,19 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: iot-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: iot-service
+  template:
+    metadata:
+      labels:
+        app: iot-service
+    spec:
+      containers:
+        - name: iot-service
+          image: luviandsp/iot-service:v1 # Ganti dengan image Docker Chef Service Anda
+          ports:
+            - containerPort: 3004

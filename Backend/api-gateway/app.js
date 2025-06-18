@@ -13,6 +13,7 @@ const port = process.env.API_GATEWAY_PORT;
 const WAITER_SERVICE_URL = 'http://waiter-service:3001';
 const CHEF_SERVICE_URL = 'http://chef-service:3002';
 const AUTH_SERVICE_URL = 'http://auth-service:3003';
+const IOT_SERVICE_URL = 'http://iot-service:3004';
 
 const apiLimiter = rateLimit({
     windowMs: 1 * 60 * 1000, // 1 minutes
@@ -64,6 +65,14 @@ app.use('/auth', apiLimiter, apiThrottle, createProxyMiddleware({
         '^/auth': '',
     },
 }));
+
+app.use('/iot', apiLimiter, apiThrottle, createProxyMiddleware({
+    target: IOT_SERVICE_URL,
+    changeOrigin: true,
+    pathRewrite: {
+        '^/iot': '',
+    },
+}))
 
 app.listen(port, () => {
     console.log(`API Gateway listening on port ${port}`);
