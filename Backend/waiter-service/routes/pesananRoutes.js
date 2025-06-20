@@ -1,7 +1,7 @@
 const express = require('express');
-const Pesanan = require('../../shared/models/pesanan'); // Import the Pesanan model
+const Pesanan = require('../models/pesanan');
+const Counter = require('../models/nomorPesanan');
 const router = express.Router();
-const Counter = require('../../shared/models/nomorPesanan');
 
 router.post('/pesanans', async (req, res) => {
   let counterIncremented = false; // Flag untuk melacak apakah counter sudah diinkremen

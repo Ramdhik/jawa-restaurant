@@ -104,34 +104,6 @@
 
   <script>
     document.addEventListener('DOMContentLoaded', () => {
-      // === AUTENTIKASI ===
-      const token = localStorage.getItem('token');
-      const userRole = localStorage.getItem('userRole');
-
-      if (!token || userRole !== 'Pelayan') {
-          alert('Akses ditolak. Silakan login sebagai Pelayan.');
-          window.location.href = '/loginpage.html';
-          return; // Hentikan eksekusi script
-      }
-
-      // Fungsi helper untuk fetch dengan header Authorization
-      async function fetchWithAuth(url, options = {}) {
-          const headers = {
-              ...options.headers,
-              'Content-Type': 'application/json',
-              'Authorization': `Bearer ${token}`
-          };
-          const response = await fetch(url, { ...options, headers });
-
-          if (response.status === 401 || response.status === 400) { // Token tidak valid atau kadaluarsa
-              localStorage.clear();
-              alert('Sesi Anda telah berakhir. Silakan login kembali.');
-              window.location.href = '/loginpage.html';
-              throw new Error('Sesi tidak valid');
-          }
-          return response;
-      }
-
       // === ELEMEN DOM ===
       const foodGrid = document.querySelector('#food-grid');
       const orderSummaryItems = document.querySelector('#order-summary-items');
@@ -141,17 +113,19 @@
       const orderCardsGrid = document.querySelector('#order-cards-grid');
 
       // === STATE APLIKASI ===
-      const pelayanId = localStorage.getItem('userId'); // Ambil ID Pelayan dari localStorage
       let currentOrder = [];
       let menuItems = [];
       let activeCategory = 'Makanan Utama';
+
+      // === PENTING: GANTI ID INI DENGAN ID USER DARI DATABASE ANDA ===
+      const pelayanId = '68483fac6f7994567cc8f3ab';
 
       // === FUNGSI-FUNGSI ===
 
       // 1. Ambil data menu dari server
       async function fetchMenu() {
         try {
-          const response = await fetchWithAuth('/waiter/menumakanans');
+          const response = await fetch('/waiter/menumakanans');
           if (!response.ok) throw new Error('Gagal mengambil data menu');
           menuItems = await response.json();
           displayMenu();
@@ -272,7 +246,7 @@
           metodePembayaran: document.querySelector('#payment-method-select').value,
         };
         try {
-          const response = await fetchWithAuth('/waiter/pesanans', {
+          const response = await fetch('/waiter/pesanans', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(orderData),
@@ -295,7 +269,7 @@
       // 7. Ambil pesanan yang aktif
       async function fetchActiveOrders() {
         try {
-          const response = await fetchWithAuth('/chef/pesanans');
+          const response = await fetch('/chef/pesanans');
           if (!response.ok) throw new Error('Gagal mengambil pesanan aktif');
           const allOrders = await response.json();
           const activeOrders = allOrders.filter(order => order.status !== 'Selesai');
@@ -337,7 +311,7 @@
       async function completeOrder(orderId) {
         if (!confirm('Apakah Anda yakin ingin menyelesaikan pesanan ini?')) return;
         try {
-          const response = await fetchWithAuth(`/chef/pesanans/${orderId}`, {
+          const response = await fetch(`/chef/pesanans/${orderId}`, {
             method: 'PATCH',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ status: 'Selesai' })

@@ -1,0 +1,19 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: waiter-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: waiter-service
+  template:
+    metadata:
+      labels:
+        app: waiter-service
+    spec:
+      containers:
+        - name: waiter-service
+          image: luviandsp/waiter-service:v1 # Ganti dengan image Docker Waiter Service Anda
+          ports:
+            - containerPort: 3001

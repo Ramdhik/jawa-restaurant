@@ -11,7 +11,7 @@
   <div class="bg-white p-8 rounded-md shadow-md w-full max-w-sm text-center">
     <h2 class="text-xl font-semibold mb-6">Register</h2>
 
-    <form id="register1-form" class="space-y-3 text-left">
+    <form class="space-y-3 text-left">
 
       <input id="namaLengkap" type="text" placeholder="Nama Lengkap" class="w-full px-4 py-2 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"/>
 
@@ -30,57 +30,131 @@
         <option>Chef</option>
       </select>
 
-      <button type="submit" class="w-full bg-gray-700 text-white py-2 rounded hover:bg-gray-800 mt-2">Sign Up</button>
+      <button id="signupButton" type="submit" class="w-full bg-gray-700 text-white py-2 rounded hover:bg-gray-800 mt-2">Sign Up</button>
 
     </form>
   </div>
 
   <script>
-  document.addEventListener('DOMContentLoaded', () => {
-    const registerForm = document.querySelector('#register1-form');
+    document.addEventListener('DOMContentLoaded', () => {
+        console.log('Register page script loaded.');
 
-    registerForm.addEventListener('submit', async (event) => {
-      event.preventDefault(); // Mencegah form mengirim data secara default
+        // 1. Ambil elemen DOM
+        const namaLengkapInput = document.getElementById('namaLengkap');
+        const usernameInput = document.getElementById('username');
+        const teleponInput = document.getElementById('telepon');
+        const emailInput = document.getElementById('email');
+        const passwordInput = document.getElementById('password');
+        const confirmPasswordInput = document.getElementById('confirmPassword');
+        const roleSelect = document.getElementById('role');
+        const signupButton = document.getElementById('signupButton');
 
-      const namaLengkap = document.querySelector('#namaLengkap').value;
-      const username = document.querySelector('#username').value;
-      const telepon = document.querySelector('#telepon').value;
-      const email = document.querySelector('#email').value;
-      const password = document.querySelector('#password').value;
-      const confirmPassword = document.querySelector('#confirmPassword').value;
-      const role = document.querySelector('#role').value;
+        // --- Konfigurasi URL API Gateway ---
+        // Sesuaikan ini nanti saat deploy ke Kubernetes atau cloud
+        const API_GATEWAY_BASE_URL = 'http://localhost:30000'; // Untuk testing lokal
+        // const API_GATEWAY_BASE_URL = 'https://api.domainanda.com'; // Contoh untuk produksi
 
-      if (password !== confirmPassword) {
-        alert('Password dan konfirmasi password tidak cocok!');
-        return;
-      }
+        // URL untuk redirect setelah sukses register (misalnya ke halaman login)
+        const LOGIN_PAGE_URL = 'http://localhost:5500/Frontend/loginpage.html'; // Sesuaikan jika frontend di-deploy
+        // ------------------------------------
 
-      const userData = { namaLengkap, username, telepon, email, password, role };
+        console.log('API_GATEWAY_BASE_URL:', API_GATEWAY_BASE_URL);
 
-      try {
-        // Request ke API Gateway, bukan langsung ke auth-service
-        const response = await fetch('/auth/users', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(userData)
+        // 2. Tambahkan event listener ke form (lebih baik ke form daripada tombol submit)
+        signupButton.addEventListener('click', async (e) => {
+            e.preventDefault(); // Mencegah form untuk refresh halaman
+            console.log('Register form submitted.');
+
+            // 3. Ambil nilai dari input
+            const namaLengkap = namaLengkapInput.value.trim();
+            const username = usernameInput.value.trim();
+            const telepon = teleponInput.value.trim();
+            const email = emailInput.value.trim();
+            const password = passwordInput.value.trim();
+            const confirmPassword = confirmPasswordInput.value.trim();
+            const role = roleSelect.value;
+
+            console.log('Nama Lengkap:', namaLengkap);
+            console.log('Username:', username);
+            console.log('No. Telepon:', telepon);
+            console.log('Email:', email);
+            console.log('Password:', password ? '*****' : '[empty]'); // Hindari log password asli
+            console.log('Confirm Password:', confirmPassword ? '*****' : '[empty]');
+            console.log('Role:', role);
+
+            // 4. Validasi di sisi frontend
+            if (!namaLengkap || !username || !telepon || !email || !password || !confirmPassword) {
+                alert('Semua field wajib diisi!');
+                console.warn('Validation failed: All fields are required.');
+                return;
+            }
+
+            if (password !== confirmPassword) {
+                alert('Konfirmasi password tidak cocok dengan password!');
+                console.warn('Validation failed: Passwords do not match.');
+                return;
+            }
+
+            if (password.length < 6) { // Contoh: minimal 6 karakter
+                alert('Password minimal 6 karakter!');
+                console.warn('Validation failed: Password too short.');
+                return;
+            }
+
+            // Validasi format email sederhana
+            if (!/\S+@\S+\.\S+/.test(email)) {
+                alert('Format email tidak valid!');
+                console.warn('Validation failed: Invalid email format.');
+                return;
+            }
+
+            // 5. Buat objek data untuk dikirim ke backend
+            const data = {
+                namaLengkap: namaLengkap,
+                username: username,
+                telepon: telepon,
+                email: email,
+                password: password,
+                role: role,
+                isProfileComplete: true // Atur ini ke true jika semua data di sini dianggap lengkap
+            };
+
+            // 6. Kirim data ke backend menggunakan Fetch API
+            try {
+                console.log('Sending registration request to:', `${API_GATEWAY_BASE_URL}/users`);
+                console.log('Request payload:', data); // Log payload untuk debugging
+
+                const response = await fetch(`${API_GATEWAY_BASE_URL}/auth/users`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                    },
+                    body: JSON.stringify(data),
+                });
+
+                console.log('Raw response from /users:', response);
+
+                const result = await response.json();
+                console.log('Parsed result from /users:', result);
+
+                if (response.ok) { // Status 2xx
+                    alert('Registrasi berhasil! Silakan login.');
+                    console.log('Registration successful. Redirecting to login page...');
+                    window.location.href = LOGIN_PAGE_URL; // Redirect ke halaman login
+                } else {
+                    // Penanganan error dari backend (misalnya, username/email sudah terdaftar)
+                    const errorMessage = result.message || JSON.stringify(result);
+                    alert('Registrasi gagal: ' + errorMessage);
+                    console.error('Registration failed. Server response not OK:', response.status, result);
+                }
+            } catch (error) {
+                console.error('Terjadi kesalahan jaringan atau server:', error);
+                alert('Terjadi kesalahan saat berkomunikasi dengan server.');
+            }
         });
-
-        const result = await response.json();
-
-        if (!response.ok) {
-          throw new Error(result.message || 'Gagal mendaftar');
-        }
-
-        alert('Pendaftaran berhasil! Silakan login.');
-        window.location.href = '/loginpage.html'; // Arahkan ke halaman login
-
-      } catch (error) {
-        console.error('Error saat mendaftar:', error);
-        alert(`Error: ${error.message}`);
-      }
     });
-  });
-</script>
+  </script>
 
 </body>
 </html>

@@ -101,36 +101,10 @@
       </div>
     </div>
   </div>
-  <script>
+</body>
+
+<script>
 document.addEventListener('DOMContentLoaded', () => {
-    // === AUTENTIKASI ===
-    const token = localStorage.getItem('token');
-    const userRole = localStorage.getItem('userRole');
-
-    if (!token || userRole !== 'Chef') {
-      alert('Akses ditolak. Silakan login sebagai Chef.');
-      window.location.href = '/loginpage.html';
-      return; // Hentikan eksekusi script
-    }
-
-    // Fungsi helper untuk fetch dengan header Authorization
-    async function fetchWithAuth(url, options = {}) {
-        const headers = {
-            ...options.headers,
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
-        };
-        const response = await fetch(url, { ...options, headers });
-
-        if (response.status === 401 || response.status === 400) { // Token tidak valid atau kadaluarsa
-            localStorage.clear();
-            alert('Sesi Anda telah berakhir. Silakan login kembali.');
-            window.location.href = '/loginpage.html';
-            throw new Error('Sesi tidak valid');
-        }
-        return response;
-    }
-
     // === ELEMEN DOM ===
     const ordersGrid = document.querySelector('#orders-grid');
     const orderDetailId = document.querySelector('#order-detail-id');
@@ -140,7 +114,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const completeButton = document.querySelector('#complete-button'); // Variabel baru
 
     // === STATE APLIKASI ===
-    const chefId = localStorage.getItem('userId'); // Ambil ID Chef dari localStorage
     let allOrders = [];
     let selectedOrder = null;
 
@@ -149,7 +122,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // 1. Ambil semua data pesanan dari server
     async function fetchOrders() {
         try {
-            const response = await fetchWithAuth('/chef/pesanans');
+            const response = await fetch('/chef/pesanans');
             if (!response.ok) throw new Error('Gagal mengambil data pesanan');
             allOrders = await response.json();
             displayOrders(allOrders);
@@ -220,7 +193,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         try {
-            const response = await fetchWithAuth(`/chef/pesanans/${selectedOrder._id}`, {
+            const response = await fetch(`/chef/pesanans/${selectedOrder._id}`, {
                 method: 'PATCH',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ status: newStatus })
@@ -255,6 +228,5 @@ document.addEventListener('DOMContentLoaded', () => {
     completeButton.addEventListener('click', () => updateOrderStatus('Selesai'));
 });
 </script>
-</body>
 
 </html>

@@ -3,71 +3,111 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Sign Up With Google</title>
-  <script src="https://cdn.tailwindcss.com"></script>
+  <title>Lengkapi Profil Anda</title>   <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-gray-200 flex items-center justify-center min-h-screen">
-
+  
   <div class="bg-white p-8 rounded-md shadow-md w-full max-w-sm text-center">
-    <h2 class="text-xl font-semibold mb-6">Register</h2>
-
-    <form id="register2-form" class="space-y-3 text-left">
-
-      <input id="namaLengkap" type="text" placeholder="Nama Lengkap" class="w-full px-4 py-2 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"/>
-
-      <input id="username" type="text" placeholder="Username" class="w-full px-4 py-2 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"/>
-
-      <input id="telepon" type="text" placeholder="No. Telepon" class="w-full px-4 py-2 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"/>
-
-      <select id="role" class="w-full px-4 py-2 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-400">
-        <option>Pelayan</option>
-        <option>Chef</option>
+    <h2 class="text-xl font-semibold mb-6">Lengkapi Profil Anda</h2>
+    <form id="completeProfileForm" class="space-y-3 text-left">
+      <input type="text" id="namaLengkap" placeholder="Nama Lengkap" class="w-full px-4 py-2 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-400" required/>
+      <input type="text" id="username" placeholder="Username" class="w-full px-4 py-2 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-400" required/>
+      <input type="text" id="telepon" placeholder="No. Telepon" class="w-full px-4 py-2 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-400" required/>
+      <select id="role" class="w-full px-4 py-2 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-400" required>
+        <option value="">Pilih Role</option>
+        <option value="Pelayan">Pelayan</option>
+        <option value="Chef">Chef</option>
       </select>
 
-      <button type="submit" class="w-full bg-gray-700 text-white py-2 rounded hover:bg-gray-800 mt-2">Sign Up</button>
+      <button type="submit" class="w-full bg-gray-700 text-white py-2 rounded hover:bg-gray-800 mt-2">Simpan Profil</button>
+</form>
+</div>
 
-    </form>
-  </div>
+<script>
 
-  <script>
+  const FRONTEND_BASE_URL = 'http://127.0.0.1:5500';
+
   document.addEventListener('DOMContentLoaded', () => {
-    const registerForm = document.querySelector('#register2-form');
+    // Pastikan ID ini cocok dengan ID di elemen HTML di atas
+    const form = document.getElementById('completeProfileForm');
+    const namaLengkapInput = document.getElementById('namaLengkap');
+    const usernameInput = document.getElementById('username');
+    const teleponInput = document.getElementById('telepon');
+    const roleSelect = document.getElementById('role');
 
-    registerForm.addEventListener('submit', async (event) => {
-      event.preventDefault(); // Mencegah form mengirim data secara default
+        // Fungsi untuk mendapatkan nilai cookie berdasarkan nama
+    function getCookie(name) {
+        const nameEQ = name + "=";
+        const ca = document.cookie.split(';');
+        for (let i = 0; i < ca.length; i++) {
+            let c = ca[i];
+            while (c.charAt(0) === ' ') c = c.substring(1, c.length);
+            if (c.indexOf(nameEQ) === 0) return c.substring(nameEQ.length, c.length);
+        }
+        return null;
+    }
 
-      const namaLengkap = document.querySelector('#namaLengkap').value;
-      const username = document.querySelector('#username').value;
-      const telepon = document.querySelector('#telepon').value;
-      const role = document.querySelector('#role').value;
+    // Ambil ID pengguna dari URL (misalnya: http://127.0.0.1:5500/Frontend/register2.html?userId=someId)
+    const urlParams = new URLSearchParams(window.location.search);
+    const userIdFromUrl = urlParams.get('userId'); // Ini adalah ID user yang baru login via Google
 
-      if (password !== confirmPassword) {
-        alert('Password dan konfirmasi password tidak cocok!');
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault(); // Mencegah form untuk refresh halaman
+
+      const namaLengkap = namaLengkapInput.value.trim();
+      const username = usernameInput.value.trim();
+      const telepon = teleponInput.value.trim();
+      const role = roleSelect.value;
+      
+      // Validasi dasar di frontend
+      if (!namaLengkap || !username || !telepon || !role || role === "") {
+        alert('Semua field wajib diisi dan role harus dipilih!');
         return;
       }
 
-      const userData = { namaLengkap, username, telepon, role };
+      const data = {
+        namaLengkap: namaLengkap,
+        username: username,
+        telepon: telepon,
+        role: role
+      };
 
       try {
-        // Request ke API Gateway, bukan langsung ke auth-service
-        const response = await fetch('/auth/users', {
+        const jwtToken = getCookie('jwt');
+
+        if (!jwtToken) {
+            alert('Token autentikasi tidak ditemukan. Silakan login kembali.');
+            return;
+        }
+
+        // URL endpoint API Gateway yang mengarah ke auth-service
+        const response = await fetch('http://localhost:30000/auth/complete-profile', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(userData)
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + jwtToken
+          },
+          body: JSON.stringify(data)
         });
 
         const result = await response.json();
 
-        if (!response.ok) {
-          throw new Error(result.message || 'Gagal mendaftar');
+        // Periksa status response
+        if (response.ok) {
+          alert(result.message + '\nSelamat datang, ' + result.user.namaLengkap + '!');
+          // Redirect ke halaman dashboard atau beranda setelah profil lengkap
+          // Pastikan URL ini sesuai dengan URL dashboard di frontend Anda
+            if (result.user.role === 'Pelayan') {
+              window.location.href = `${FRONTEND_BASE_URL}/Frontend/dashboardpelayan.html?userId=${result.user._id}`;
+            } else {
+              window.location.href = `${FRONTEND_BASE_URL}/Frontend/dashboardchef.html?userId=${result.user._id}`;
+            }
+        } else {
+          alert('Gagal menyimpan profil: ' + result.message);
         }
-
-        alert('Pendaftaran berhasil! Silakan login.');
-        window.location.href = '/loginpage.html'; // Arahkan ke halaman login
-
       } catch (error) {
-        console.error('Error saat mendaftar:', error);
-        alert(`Error: ${error.message}`);
+        console.error('Terjadi kesalahan jaringan atau server:', error);
+        alert('Terjadi kesalahan saat berkomunikasi dengan server.');
       }
     });
   });

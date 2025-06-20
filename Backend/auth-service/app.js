@@ -1,22 +1,37 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
-const auth = require('../shared/middlewares/middlewares');
-const config = require('../shared/config/config');
+const path = require('path');
+require('dotenv').config({ path: path.resolve(__dirname, '.env') });
+const cookieParser = require('cookie-parser');
+const cors = require('cors');
 
 const app = express();
-const port = config.AUTH_PORT;
+const port = process.env.AUTH_PORT;
 
 // Middleware
+// Pastikan ini ada dan DITERAPKAN SEBELUM rute Anda
+const authCorsOptions = {
+  origin: ['http://localhost:5500', 'http://127.0.0.1:5500'], // HARUS SAMA PERSIS dengan origin frontend Anda
+  methods: ['GET', 'HEAD', 'PUT', 'PATCH', 'POST', 'DELETE'],
+  credentials: true, // SANGAT PENTING
+  optionsSuccessStatus: 204
+};
+app.use(cors(authCorsOptions)); // Terapkan middleware CORS
+
 app.use(bodyParser.json());
+app.use(cookieParser());
 
 // Routes
+const routerGoogle = require('./routes/googleRoutes');
 const routerUser = require('./routes/userRoutes');
-app.use(auth, routerUser);
+
+app.use(routerGoogle);
+app.use(routerUser);
 
 // Connect to MongoDB
 mongoose
-  .connect(config.MONGODB_URI, {
+  .connect(process.env.MONGODB_URI, {
     // useNewUrlParser: true,
     // useUnifiedTopology: true,
   })

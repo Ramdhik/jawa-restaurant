@@ -1,5 +1,5 @@
 const express = require('express');
-const MenuMakanan = require('../../shared/models/menuMakanan');
+const MenuMakanan = require('../models/menuMakanan');
 const router = express.Router();
 
 // GET all menu items
