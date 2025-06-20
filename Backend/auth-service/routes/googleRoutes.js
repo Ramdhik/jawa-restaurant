@@ -88,12 +88,12 @@ router.get('/google/callback',
 
         console.log('Payload OAuth:', payload);
 
-        const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '1h' });
+        const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '1d' });
 
         // Kirim JWT ke frontend (via cookie atau JSON)
         res.cookie('jwt', token, {
             secure: false,
-            sameSite: 'Lax',
+            sameSite: 'None',
             maxAge: 3600000 // 1 jam
         });
 
@@ -178,14 +178,14 @@ router.post('/complete-profile', authenticateJWT, async (req, res) => {
 
         console.log('Payload Complete-User:', payload);
 
-        const newToken = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '1h' });
+        const newToken = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '1d' });
 
         console.log('New Token Complete-User:', newToken);
 
         // Kirim JWT baru ke frontend (via cookie atau JSON)
         res.cookie('jwt', newToken, {
             secure: false,
-            sameSite: 'Lax',
+            sameSite: 'None',
             maxAge: 3600000
         });
 
