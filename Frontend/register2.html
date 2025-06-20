@@ -25,7 +25,7 @@
 
 <script>
 
-  const FRONTEND_BASE_URL = 'http://127.0.0.1:5500';
+  const FRONTEND_BASE_URL = 'http://localhost:5500';
 
   document.addEventListener('DOMContentLoaded', () => {
     // Pastikan ID ini cocok dengan ID di elemen HTML di atas
@@ -94,14 +94,14 @@
 
         // Periksa status response
         if (response.ok) {
+          localStorage.setItem('jwt', result.token);
           alert(result.message + '\nSelamat datang, ' + result.user.namaLengkap + '!');
           // Redirect ke halaman dashboard atau beranda setelah profil lengkap
-          // Pastikan URL ini sesuai dengan URL dashboard di frontend Anda
-            if (result.user.role === 'Pelayan') {
-              window.location.href = `${FRONTEND_BASE_URL}/Frontend/dashboardpelayan.html?userId=${result.user._id}`;
-            } else {
-              window.location.href = `${FRONTEND_BASE_URL}/Frontend/dashboardchef.html?userId=${result.user._id}`;
-            }
+          if (result.user.role === 'Pelayan') {
+            window.location.href = `http://localhost:5500/Frontend/dashboardpelayan.html?userId=${result.user.id}`;
+          } else {
+            window.location.href = `http://localhost:5500/Frontend/dashboardchef.html?userId=${result.user.id}`;
+          }
         } else {
           alert('Gagal menyimpan profil: ' + result.message);
         }

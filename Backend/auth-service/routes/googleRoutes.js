@@ -86,12 +86,14 @@ router.get('/google/callback',
             namaLengkap: user.namaLengkap
         };
 
-        const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '1h' });
+        console.log('Payload OAuth:', payload);
+
+        const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '1d' });
 
         // Kirim JWT ke frontend (via cookie atau JSON)
         res.cookie('jwt', token, {
             secure: false,
-            sameSite: 'Lax',
+            sameSite: 'None',
             maxAge: 3600000 // 1 jam
         });
 
@@ -174,22 +176,20 @@ router.post('/complete-profile', authenticateJWT, async (req, res) => {
             namaLengkap: user.namaLengkap
         };
 
-        console.log('Payload:', payload);
+        console.log('Payload Complete-User:', payload);
 
-        const newToken = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '1h' });
+        const newToken = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '1d' });
 
-        console.log('New Token:', newToken);
+        console.log('New Token Complete-User:', newToken);
 
         // Kirim JWT baru ke frontend (via cookie atau JSON)
         res.cookie('jwt', newToken, {
-
             secure: false,
             sameSite: 'None',
             maxAge: 3600000
         });
 
-        res.status(200).json({ message: 'Profil berhasil dilengkapi!', user: user.toObject({ getters: true }), token: newToken });
-
+        res.status(200).json({ message: 'Profil berhasil dilengkapi!', user: user.toObject({ getters: true }), token: newToken })
     } catch (error) {
         console.error('Error completing profile:', error);
         res.status(500).json({ message: 'Gagal melengkapi profil.', error: error.message });
