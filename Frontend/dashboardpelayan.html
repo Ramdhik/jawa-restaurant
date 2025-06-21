@@ -145,6 +145,7 @@
 
       // Ambil nilai 'userId'
       const userId = params.get('userId');
+      const pesananId = params.get('pesananId');
 
       // Sekarang Anda bisa menggunakan userId ini dalam fungsi fetchUserData Anda
       if (userId) {
@@ -154,7 +155,7 @@
       }
 
 
-      async function fetchWithAuth(endpoint, options = {}) {
+/*       async function fetchWithAuth(endpoint, options = {}) {
         const headers = {
             ...options.headers,
             'Content-Type': 'application/json',
@@ -169,7 +170,7 @@
             throw new Error('Sesi tidak valid');
         }
         return response;
-      }
+      } */
 
       async function fetchUserData(userId) {
         try {
@@ -209,14 +210,31 @@
       // 1. Ambil data menu dari server
       async function fetchMenu() {
         try {
-          const response = await fetchWithAuth('/waiter/menumakanans');
+          const response = await fetch('http://localhost:30000/waiter/menumakanans', {
+            method: 'GET',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${jwtToken}`
+            },
+          });
+
           if (!response.ok) throw new Error('Gagal mengambil data menu');
+          
           menuItems = await response.json();
           displayMenu();
         } catch (error) {
           console.error('Error fetching menu:', error);
           foodGrid.innerHTML = '<p class="text-red-500 col-span-4">Gagal memuat menu.</p>';
         }
+        /* try {
+          const response = await fetch('/waiter/menumakanans');
+          if (!response.ok) throw new Error('Gagal mengambil data menu');
+          menuItems = await response.json();
+          displayMenu();
+        } catch (error) {
+          console.error('Error fetching menu:', error);
+          foodGrid.innerHTML = '<p class="text-red-500 col-span-4">Gagal memuat menu.</p>';
+        } */
       }
 
       // 2. Tampilkan menu di halaman
@@ -330,6 +348,28 @@
           metodePembayaran: document.querySelector('#payment-method-select').value,
         };
         try {
+          const response = await fetch('http://localhost:30000/waiter/pesanans', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${jwtToken}`
+            },
+            body: JSON.stringify(orderData),
+          });
+          if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.message || 'Gagal membuat pesanan');
+          }
+          const newOrder = await response.json();
+          alert(`Pesanan ${newOrder.nomorPesanan} berhasil dibuat!`);
+          currentOrder = [];
+          updateOrderSummary();
+          fetchActiveOrders();
+        } catch (error) {
+          console.error('Error submitting order:', error);
+          alert(`Error: ${error.message}`);
+        }
+        /* try {
           const response = await fetchWithAuth('/waiter/pesanans', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -347,13 +387,20 @@
         } catch (error) {
           console.error('Error submitting order:', error);
           alert(`Error: ${error.message}`);
-        }
+        } */
       }
 
       // 7. Ambil pesanan yang aktif
       async function fetchActiveOrders() {
         try {
-          const response = await fetchWithAuth('/chef/pesanans');
+          const response = await fetch(`http://localhost:30000/chef/pesanans/`, {
+            method: 'GET',
+            headers: {
+              'Content-Type': 'application/json', // Perhatikan: Credential header ini penting jika Anda ingin menerima cookie
+              'Accept': 'application/json', // Tambahkan ini
+              'Authorization': `Bearer ${jwtToken}`
+            },
+          });
           if (!response.ok) throw new Error('Gagal mengambil pesanan aktif');
           const allOrders = await response.json();
           const activeOrders = allOrders.filter(order => order.status !== 'Selesai');
@@ -362,6 +409,17 @@
           console.error('Error fetching active orders:', error);
           orderCardsGrid.innerHTML = '<p class="text-red-500 col-span-3">Gagal memuat pesanan aktif.</p>';
         }
+
+        /* try {
+          const response = await fetchWithAuth('/chef/pesanans');
+          if (!response.ok) throw new Error('Gagal mengambil pesanan aktif');
+          const allOrders = await response.json();
+          const activeOrders = allOrders.filter(order => order.status !== 'Selesai');
+          displayActiveOrders(activeOrders);
+        } catch (error) {
+          console.error('Error fetching active orders:', error);
+          orderCardsGrid.innerHTML = '<p class="text-red-500 col-span-3">Gagal memuat pesanan aktif.</p>';
+        } */
       }
 
       // 8. Tampilkan pesanan aktif
@@ -395,6 +453,23 @@
       async function completeOrder(orderId) {
         if (!confirm('Apakah Anda yakin ingin menyelesaikan pesanan ini?')) return;
         try {
+          const response = await fetch(`http://localhost:30000/chef/pesanans/${orderId}`, {
+            method: 'PATCH',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${jwtToken}`
+            },
+            body: JSON.stringify({ status: 'Selesai' })
+          });
+          if (!response.ok) throw new Error('Gagal menyelesaikan pesanan');
+          alert('Pesanan berhasil diselesaikan!');
+          fetchActiveOrders();
+        } catch (error) {
+          console.error('Error completing order:', error);
+          alert(`Error: ${error.message}`);
+        }
+
+        /* try {
           const response = await fetchWithAuth(`/chef/pesanans/${orderId}`, {
             method: 'PATCH',
             headers: { 'Content-Type': 'application/json' },
@@ -406,7 +481,7 @@
         } catch (error) {
           console.error('Error completing order:', error);
           alert(`Error: ${error.message}`);
-        }
+        } */
       }
       
       // 10. Tangani klik pada tab
