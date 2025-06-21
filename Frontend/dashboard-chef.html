@@ -312,22 +312,60 @@
     // === INISIALISASI HALAMAN & EVENT LISTENERS ===
     fetchOrders();
 
+    // Fungsi untuk mengirim pesan ON IoT
+    async function buzzerOn() {
+      try {
+        const response = await fetch('http://localhost:30000/iot/pesanan-masuk', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' }
+        })
+
+        const data = await response.json();
+        if (!response.ok) {
+            throw new Error(data.message || 'Failed to send IoT message.');
+        }
+
+        console.log('IoT message sent successfully:', data.message);
+        return data;
+      } catch (error) {
+        console.error('Error sending IoT message:', error);
+        alert(`Error: ${error.message}`);
+        throw error;
+      }
+    }
+
+    // Fungsi untuk mengirim pesan OFF IoT
+    async function buzzerOff() {
+      try {
+        const response = await fetch('http://localhost:30000/iot/pesanan-selesai', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' }
+        })
+
+        const data = await response.json();
+        if (!response.ok) {
+            throw new Error(data.message || 'Failed to send IoT message.');
+        }
+
+        console.log('IoT message sent successfully:', data.message);
+        return data;
+      } catch (error) {
+        console.error('Error sending IoT message:', error);
+        alert(`Error: ${error.message}`);
+        throw error;
+      }
+    }
+
     // Event listener untuk setiap tombol memanggil fungsi update yang sama dengan status berbeda
     readyButton.addEventListener('click', () => {
       sendMsg('ON');
       updateOrderStatus('Siap Disajikan');
     });
+    
     completeButton.addEventListener('click', () => {
       sendMsg('OFF');
       updateOrderStatus('Selesai');
     });
-
-    const testMqttButton = document.getElementById('test-mqtt-button');
-    if (testMqttButton) {
-      testMqttButton.addEventListener('click', () => {
-        sendMsg('Tes');
-      });
-    }
   });
 </script>
 

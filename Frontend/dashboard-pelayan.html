@@ -447,6 +447,50 @@
 
           displayMenu();
       }
+      
+    // 11. Fungsi untuk mengirim pesan ON IoT
+    async function buzzerOn() {
+      try {
+        const response = await fetch('http://localhost:30000/iot/pesanan-masuk', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' }
+        })
+
+        const data = await response.json();
+        if (!response.ok) {
+            throw new Error(data.message || 'Failed to send IoT message.');
+        }
+
+        console.log('IoT message sent successfully:', data.message);
+        return data;
+      } catch (error) {
+        console.error('Error sending IoT message:', error);
+        alert(`Error: ${error.message}`);
+        throw error;
+      }
+    }
+
+    // 12. Fungsi untuk mengirim pesan OFF IoT
+    async function buzzerOff() {
+      try {
+        const response = await fetch('http://localhost:30000/iot/pesanan-selesai', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' }
+        })
+
+        const data = await response.json();
+        if (!response.ok) {
+            throw new Error(data.message || 'Failed to send IoT message.');
+        }
+
+        console.log('IoT message sent successfully:', data.message);
+        return data;
+      } catch (error) {
+        console.error('Error sending IoT message:', error);
+        alert(`Error: ${error.message}`);
+        throw error;
+      }
+    }
 
       // === INISIALISASI HALAMAN ===
       fetchMenu();
