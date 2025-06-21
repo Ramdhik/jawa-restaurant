@@ -117,22 +117,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const orderDetailItems = document.querySelector('#order-detail-items');
     const readyButton = document.querySelector('#ready-button');
     const completeButton = document.querySelector('#complete-button'); // Variabel baru
-
     const chefName = document.getElementById('chef-name');
     const chefRole = document.getElementById('chef-role');
-
-    const jwtToken = localStorage.getItem('jwt');
-
-        // Event Logout
-      const logoutButton = document.getElementById('logout-button');
-
-      logoutButton.addEventListener('click', () => {
-        // Hapus token dari localStorage
-        localStorage.removeItem('jwt');
-
-        // Arahkan pengguna ke halaman login
-        window.location.href = 'http://localhost:5500/Frontend/loginpage.html';
-      });
+    const logoutButton = document.getElementById('logout-button');
 
       // Dapatkan URL saat ini
       const currentUrl = window.location.href;
@@ -143,15 +130,34 @@ document.addEventListener('DOMContentLoaded', () => {
       // Dapatkan parameter query dari URL
       const params = new URLSearchParams(url.search);
 
-      // Ambil nilai 'userId'
-      const userId = params.get('userId');
+      // Ambil nilai
+      const tokenFromUrl = params.get('token');
+      const userIdFromUrl = params.get('userId');
 
-      // Sekarang Anda bisa menggunakan userId ini dalam fungsi fetchUserData Anda
-      if (userId) {
-          fetchUserData(userId);
-      } else {
-          console.error('User ID tidak ditemukan di URL.');
+      if (tokenFromUrl && userIdFromUrl) {
+        localStorage.setItem('token', tokenFromUrl);
+        localStorage.setItem('userId', userIdFromUrl);
       }
+
+      const jwtToken = localStorage.getItem('token');
+      const userId = localStorage.getItem('userId');
+
+      if (!jwtToken || !userId) {
+        console.error('Token atau User ID tidak ditemukan.');
+        return;
+      } else {
+        params.delete('token');
+        params.delete('userId');
+        url.search = params.toString();
+        window.history.pushState({}, '', url.href);
+      }
+
+    // Sekarang Anda bisa menggunakan userId ini dalam fungsi fetchUserData Anda
+    if (userId) {
+        fetchUserData(userId);
+    } else {
+        console.error('User ID tidak ditemukan di URL.');
+    }
 
       async function fetchUserData(userId) {
         try {
@@ -165,7 +171,7 @@ document.addEventListener('DOMContentLoaded', () => {
             },
           });
 
-          if (!response.ok) throw new Error('Gagal mengambil data user');
+        if (!response.ok) throw new Error('Gagal mengambil data user');
 
           const userData = await response.json();
 
@@ -177,6 +183,14 @@ document.addEventListener('DOMContentLoaded', () => {
           console.error('Error fetching user data:', error);
         }
       }
+
+    logoutButton.addEventListener('click', () => {
+      // Hapus semua data dari localStorage
+      localStorage.clear();
+
+      // Arahkan pengguna ke halaman login
+      window.location.href = 'http://localhost:5500/Frontend/loginpage.html';
+    });
 
     // === STATE APLIKASI ===
     let allOrders = [];
