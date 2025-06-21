@@ -90,24 +90,17 @@ router.get('/google/callback',
 
         const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '1d' });
 
-        // Kirim JWT ke frontend (via cookie atau JSON)
-        res.cookie('jwt', token, {
-            secure: false,
-            sameSite: 'None',
-            maxAge: 3600000 // 1 jam
-        });
-
         console.log('Token OAuth:', token);
 
         if (!user.isProfileComplete) {
             // Redirect ke halaman pendaftaran frontend
-            return res.redirect(`http://localhost:5500/Frontend/register2.html?userId=${user._id}`);
+            return res.redirect(`http://localhost:5500/Frontend/register2.html?userId=${user._id}&token=${token}`);
         } else {
             // Redirect ke halaman profil atau dashboard utama jika sudah lengkap
             if (user.role === 'Pelayan') {
-                return res.redirect(`http://localhost:5500/Frontend/dashboardpelayan.html?userId=${user._id}`); // Atau ke URL dashboard frontend Anda
+                return res.redirect(`http://localhost:5500/Frontend/dashboardpelayan.html?userId=${user._id}&token=${token}`); // Atau ke URL dashboard frontend Anda
             } else if (user.role === 'Chef') {
-                return res.redirect(`http://localhost:5500/Frontend/dashboardchef.html?userId=${user._id}`); // Atau ke URL dashboard frontend Anda
+                return res.redirect(`http://localhost:5500/Frontend/dashboardchef.html?userId=${user._id}&token=${token}`); // Atau ke URL dashboard frontend Anda
             }
         }
     }
@@ -181,14 +174,7 @@ router.post('/complete-profile', authenticateJWT, async (req, res) => {
         const newToken = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '1d' });
 
         console.log('New Token Complete-User:', newToken);
-
-        // Kirim JWT baru ke frontend (via cookie atau JSON)
-        res.cookie('jwt', newToken, {
-            secure: false,
-            sameSite: 'None',
-            maxAge: 3600000
-        });
-
+        
         res.status(200).json({ message: 'Profil berhasil dilengkapi!', user: user.toObject({ getters: true }), token: newToken })
     } catch (error) {
         console.error('Error completing profile:', error);

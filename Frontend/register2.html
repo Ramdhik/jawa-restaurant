@@ -35,21 +35,20 @@
     const teleponInput = document.getElementById('telepon');
     const roleSelect = document.getElementById('role');
 
-        // Fungsi untuk mendapatkan nilai cookie berdasarkan nama
-    function getCookie(name) {
-        const nameEQ = name + "=";
-        const ca = document.cookie.split(';');
-        for (let i = 0; i < ca.length; i++) {
-            let c = ca[i];
-            while (c.charAt(0) === ' ') c = c.substring(1, c.length);
-            if (c.indexOf(nameEQ) === 0) return c.substring(nameEQ.length, c.length);
-        }
-        return null;
-    }
-
     // Ambil ID pengguna dari URL (misalnya: http://127.0.0.1:5500/Frontend/register2.html?userId=someId)
     const urlParams = new URLSearchParams(window.location.search);
     const userIdFromUrl = urlParams.get('userId'); // Ini adalah ID user yang baru login via Google
+    const token = urlParams.get('token');
+
+    if (token) {
+    localStorage.setItem('jwtToken', token); // Simpan token di localStorage
+    // Opsional: hapus token dari URL agar tidak terlihat di address bar setelah disimpan
+    // history.replaceState(null, '', window.location.pathname + window.location.hash);
+    } else {
+        // Handle kasus jika token tidak ditemukan (misalnya, redirect ke login)
+        console.error('Token tidak ditemukan di URL.');
+        // window.location.href = '/login'; // atau halaman login Anda
+    }
 
     form.addEventListener('submit', async (e) => {
       e.preventDefault(); // Mencegah form untuk refresh halaman
@@ -73,19 +72,13 @@
       };
 
       try {
-        const jwtToken = getCookie('jwt');
-
-        if (!jwtToken) {
-            alert('Token autentikasi tidak ditemukan. Silakan login kembali.');
-            return;
-        }
 
         // URL endpoint API Gateway yang mengarah ke auth-service
         const response = await fetch('http://localhost:30000/auth/complete-profile', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': 'Bearer ' + jwtToken
+            'Authorization': `Bearer ${localStorage.getItem('jwtToken')}`
           },
           body: JSON.stringify(data)
         });
