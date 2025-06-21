@@ -117,24 +117,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const orderDetailItems = document.querySelector('#order-detail-items');
     const readyButton = document.querySelector('#ready-button');
     const completeButton = document.querySelector('#complete-button'); // Variabel baru
-
     const chefName = document.getElementById('chef-name');
     const chefRole = document.getElementById('chef-role');
-
-    const API_GATEWAY_URL = 'http://localhost:5500';
-
-    const jwtToken = localStorage.getItem('jwt');
-
-        // Event Logout
-      const logoutButton = document.getElementById('logout-button');
-
-      logoutButton.addEventListener('click', () => {
-        // Hapus token dari localStorage
-        localStorage.removeItem('jwt');
-
-        // Arahkan pengguna ke halaman login
-        window.location.href = 'http://localhost:5500/Frontend/loginpage.html';
-      });
+    const logoutButton = document.getElementById('logout-button');
 
       // Dapatkan URL saat ini
       const currentUrl = window.location.href;
@@ -145,32 +130,34 @@ document.addEventListener('DOMContentLoaded', () => {
       // Dapatkan parameter query dari URL
       const params = new URLSearchParams(url.search);
 
-      // Ambil nilai 'userId'
-      const userId = params.get('userId');
+      // Ambil nilai
+      const tokenFromUrl = params.get('token');
+      const userIdFromUrl = params.get('userId');
 
-      // Sekarang Anda bisa menggunakan userId ini dalam fungsi fetchUserData Anda
-      if (userId) {
-          fetchUserData(userId);
+      if (tokenFromUrl && userIdFromUrl) {
+        localStorage.setItem('token', tokenFromUrl);
+        localStorage.setItem('userId', userIdFromUrl);
+      }
+
+      const jwtToken = localStorage.getItem('token');
+      const userId = localStorage.getItem('userId');
+
+      if (!jwtToken || !userId) {
+        console.error('Token atau User ID tidak ditemukan.');
+        return;
       } else {
-          console.error('User ID tidak ditemukan di URL.');
+        params.delete('token');
+        params.delete('userId');
+        url.search = params.toString();
+        window.history.pushState({}, '', url.href);
       }
 
-      async function fetchWithAuth(endpoint, options = {}) {
-        const headers = {
-            ...options.headers,
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${jwtToken}`
-        };
-        const response = await fetch(`${API_GATEWAY_URL}${endpoint}`, { ...options, headers });
-
-        if (response.status === 401 || response.status === 400) { // Token tidak valid atau kadaluarsa
-            localStorage.clear();
-            alert('Sesi Anda telah berakhir. Silakan login kembali.');
-            window.location.href = '/Frontend/loginpage.html';
-            throw new Error('Sesi tidak valid');
-        }
-        return response;
-      }
+    // Sekarang Anda bisa menggunakan userId ini dalam fungsi fetchUserData Anda
+    if (userId) {
+        fetchUserData(userId);
+    } else {
+        console.error('User ID tidak ditemukan di URL.');
+    }
 
       async function fetchUserData(userId) {
         try {
@@ -184,7 +171,7 @@ document.addEventListener('DOMContentLoaded', () => {
             },
           });
 
-          if (!response.ok) throw new Error('Gagal mengambil data user');
+        if (!response.ok) throw new Error('Gagal mengambil data user');
 
           const userData = await response.json();
 
@@ -197,6 +184,14 @@ document.addEventListener('DOMContentLoaded', () => {
         }
       }
 
+    logoutButton.addEventListener('click', () => {
+      // Hapus semua data dari localStorage
+      localStorage.clear();
+
+      // Arahkan pengguna ke halaman login
+      window.location.href = 'http://localhost:5500/Frontend/loginpage.html';
+    });
+
     // === STATE APLIKASI ===
     let allOrders = [];
     let selectedOrder = null;
@@ -206,7 +201,14 @@ document.addEventListener('DOMContentLoaded', () => {
     // 1. Ambil semua data pesanan dari server
     async function fetchOrders() {
         try {
-            const response = await fetchWithAuth('/chef/pesanans');
+            const response = await fetch('http://localhost:30000/chef/pesanans', {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json', // Perhatikan: Credential header ini penting jika Anda ingin menerima cookie
+                    'Accept': 'application/json', // Tambahkan ini
+                    'Authorization': `Bearer ${jwtToken}`
+                },
+            }); 
             if (!response.ok) throw new Error('Gagal mengambil data pesanan');
             allOrders = await response.json();
             displayOrders(allOrders);
@@ -277,9 +279,10 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         try {
-            const response = await fetchWithAuth(`/chef/pesanans/${selectedOrder._id}`, {
+            const response = await fetch(`http://localhost:30000/chef/pesanans/${selectedOrder._id}`, {
                 method: 'PATCH',
-                headers: { 'Content-Type': 'application/json' },
+                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${jwtToken}` },
+
                 body: JSON.stringify({ status: newStatus })
             });
 

@@ -28,9 +28,6 @@ passport.use(new googleStrategy({
         let user = await User.findOne({ googleId: profile.id });
 
         if (user) {
-            user.namaLengkap = profile.displayName;
-            user.email = profile.emails && profile.emails[0] ? profile.emails[0].value : user.email;
-            await user.save();
             return done(null, user);
         } else {
             const newUser = new User({
@@ -174,7 +171,7 @@ router.post('/complete-profile', authenticateJWT, async (req, res) => {
         const newToken = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '1d' });
 
         console.log('New Token Complete-User:', newToken);
-        
+
         res.status(200).json({ message: 'Profil berhasil dilengkapi!', user: user.toObject({ getters: true }), token: newToken })
     } catch (error) {
         console.error('Error completing profile:', error);
