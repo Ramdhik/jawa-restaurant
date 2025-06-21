@@ -20,7 +20,7 @@
     <button type="button" id="loginButton" class="w-full bg-gray-700 text-white py-2 rounded mb-3 hover:bg-gray-800">Login</button>
 
     <p class="text-sm">Don't have an account?
-      <a href="register1.html" class="text-blue-500 hover:underline">Create account</a>
+      <a href="register.html" class="text-blue-500 hover:underline">Create account</a>
     </p>
 
     <div class="flex items-center my-4">
@@ -42,44 +42,27 @@
     const usernameInput = document.getElementById('username');
     const passwordInput = document.getElementById('password');
     const loginButton = document.getElementById('loginButton');
-    // Perbaikan: gunakan getElementById karena googleButton punya ID
     const googleButton = document.getElementById('googleButton'); 
 
-    // --- Konfigurasi URL untuk Lingkungan Kubernetes ---
-    // Sesuaikan ini nanti saat deploy ke Kubernetes atau cloud
-    // Jika API Gateway diakses melalui LoadBalancer/Ingress di domain tertentu:
     const API_GATEWAY_BASE_URL = 'http://localhost:30000'; // Untuk testing lokal
-    // const API_GATEWAY_BASE_URL = 'https://api.domainanda.com'; // Contoh untuk produksi
 
-    // URL untuk frontend setelah login/redirect
-    const FRONTEND_BASE_URL = 'http://localhost:5500'; // Untuk testing lokal
-    // const FRONTEND_BASE_URL = 'https://frontend.domainanda.com'; // Contoh untuk produksi
-    // ----------------------------------------------------
+    const FRONTEND_BASE_URL = 'http://localhost:80'; // Untuk testing lokal
 
     console.log('API_GATEWAY_BASE_URL:', API_GATEWAY_BASE_URL);
     console.log('FRONTEND_BASE_URL:', FRONTEND_BASE_URL);
 
-    // Event Listener untuk Tombol Google Login
-    // Perbaikan: gunakan 'click' event untuk tombol, bukan 'submit'
     if (googleButton) {
       googleButton.addEventListener('click', async (e) => {
         e.preventDefault(); 
         console.log('Google button clicked. Redirecting browser to API Gateway for Google auth...');
 
-        // INI PENTING: Langsung arahkan browser ke endpoint API Gateway
-        // yang akan memulai redirect ke Google.
         window.location.href = `${API_GATEWAY_BASE_URL}/auth/google`; 
         
-        // Hapus semua kode `fetch` yang ada di dalam event listener ini
-        // karena `fetch` tidak bisa menangani alur OAuth dengan redirect ke domain pihak ketiga seperti ini.
       });
     } else {
       console.error('Element with ID "googleButton" not found.');
     }
 
-
-    // Event Listener untuk Tombol Login Biasa
-    // Perbaikan: gunakan 'click' event untuk tombol, bukan 'submit'
     if (loginButton) {
       loginButton.addEventListener('click', async (e) => { 
         e.preventDefault(); 
@@ -87,12 +70,9 @@
 
         const username = usernameInput.value.trim();
         const password = passwordInput.value.trim();
-        
-        console.log('username input:', username);
-        console.log('Password input:', password ? '*****' : 'empty'); // Jangan log password asli
 
         // Validasi dasar di frontend
-        if (!username || password === "") { // Perbaikan: "!password === """
+        if (!username || password === "") {
           alert('Semua field (username dan password) wajib diisi!');
           console.warn('Validation failed: username or password is empty.');
           return;
@@ -109,11 +89,10 @@
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
-              // Perhatikan: Credential header ini penting jika Anda ingin menerima cookie
-              'Accept': 'application/json', // Tambahkan ini
+              'Accept': 'application/json',
             },
             body: JSON.stringify(data),
-            credentials: 'include' // Ini penting untuk mengirim dan menerima cookies
+            credentials: 'include'
           });
 
           console.log('Raw response from /auth/login:', response);
@@ -126,9 +105,9 @@
             console.log('Login successful. Redirecting...');
             // Redirect ke halaman dashboard atau beranda setelah profil lengkap
             if (result.user.role === 'Pelayan') {
-              window.location.href = `http://localhost:5500/Frontend/dashboardpelayan.html?userId=${result.user.id}&token=${result.token}`;
+              window.location.href = `http://localhost:80/dashboard-pelayan.html?userId=${result.user.id}&token=${result.token}`;
             } else {
-              window.location.href = `http://localhost:5500/Frontend/dashboardchef.html?userId=${result.user.id}&token=${result.token}`;
+              window.location.href = `http://localhost:80/dashboard-chef.html?userId=${result.user.id}&token=${result.token}`;
             }
           } else {
             console.error('Login failed. Server response not OK:', response.status, result);

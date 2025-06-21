@@ -32,7 +32,7 @@ const apiThrottle = throttle({
 });
 
 const authCorsOptions = {
-  origin: ['http://localhost:5500', 'http://127.0.0.1:5500'], // Frontend Anda
+  origin: ['http://localhost:5500', 'http://127.0.0.1:5500', 'http://localhost:80', 'http://127.0.0.1:80', 'http://localhost', 'http://127.0.0.1'],
   methods: ['GET', 'HEAD', 'PUT', 'PATCH', 'POST', 'DELETE'],
   credentials: true,
   optionsSuccessStatus: 204

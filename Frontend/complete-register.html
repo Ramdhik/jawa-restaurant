@@ -25,9 +25,7 @@
   </div>
 
   <script>
-    // Pastikan URL ini sesuai dengan BASE URL frontend Anda
-    const FRONTEND_BASE_URL = 'http://localhost:5500';
-    // Pastikan URL ini sesuai dengan URL API Gateway Anda yang mengarah ke auth-service
+    const FRONTEND_BASE_URL = 'http://localhost:80';
     const API_GATEWAY_AUTH_URL = 'http://localhost:30000/auth';
 
     document.addEventListener('DOMContentLoaded', async () => {
@@ -94,7 +92,7 @@
           const token = localStorage.getItem('token'); // Ambil token dari localStorage
           if (!token) {
             alert('Anda tidak terotentikasi. Silakan login kembali.');
-            window.location.href = `${FRONTEND_BASE_URL}/Frontend/loginpage.html`;
+            window.location.href = `${FRONTEND_BASE_URL}/Frontend/login.html`;
             return;
           }
 
@@ -117,9 +115,9 @@
 
             // Redirect ke halaman dashboard atau beranda setelah profil lengkap
             if (result.user.role === 'Pelayan') {
-              window.location.href = `${FRONTEND_BASE_URL}/Frontend/dashboardpelayan.html`;
+              window.location.href = `${FRONTEND_BASE_URL}/Frontend/dashboard-pelayan.html`;
             } else if (result.user.role === 'Chef') {
-              window.location.href = `${FRONTEND_BASE_URL}/Frontend/dashboardchef.html`;
+              window.location.href = `${FRONTEND_BASE_URL}/Frontend/dashboard-chef.html`;
             }
           } else {
             alert('Gagal menyimpan profil: ' + (result.message || 'Terjadi kesalahan.'));

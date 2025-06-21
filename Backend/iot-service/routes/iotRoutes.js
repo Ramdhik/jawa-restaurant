@@ -10,15 +10,18 @@ const topic = process.env.MQTT_TOPIC;
 
 const mqttClient = mqtt.connect(`mqtt://${mqttUrl}:${mqttPort}`);
 
+// Koneksi ke MQTT
 mqttClient.on('connect', () => {
     console.log('Connected to MQTT broker');
 });
 
+// Route untuk mengirim pesanan masuk (Menghidupkan Alat)
 router.get('/pesanan-masuk', (req, res) => {
     mqttClient.publish(`${topic}`, 'Pesanan Masuk');
     res.send('Pesanan Masuk dikirim ke MQTT');
 });
 
+// Route untuk mengirim pesanan selesai (Mematikan Alat)
 router.get('/pesanan-selesai', (req, res) => {
     mqttClient.publish(`${topic}`, 'Pesanan Selesai');
     res.send('Pesanan Selesai dikirim ke MQTT');

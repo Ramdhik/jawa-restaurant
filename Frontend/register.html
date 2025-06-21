@@ -49,16 +49,8 @@
         const roleSelect = document.getElementById('role');
         const signupButton = document.getElementById('signupButton');
 
-        // --- Konfigurasi URL API Gateway ---
-        // Sesuaikan ini nanti saat deploy ke Kubernetes atau cloud
-        const API_GATEWAY_BASE_URL = 'http://localhost:30000'; // Untuk testing lokal
-        // const API_GATEWAY_BASE_URL = 'https://api.domainanda.com'; // Contoh untuk produksi
-
-        // URL untuk redirect setelah sukses register (misalnya ke halaman login)
-        const LOGIN_PAGE_URL = 'http://localhost:5500/Frontend/loginpage.html'; // Sesuaikan jika frontend di-deploy
-        // ------------------------------------
-
-        console.log('API_GATEWAY_BASE_URL:', API_GATEWAY_BASE_URL);
+        const API_GATEWAY_BASE_URL = 'http://localhost:30000';
+        const LOGIN_PAGE_URL = 'http://localhost:80/login.html';
 
         // 2. Tambahkan event listener ke form (lebih baik ke form daripada tombol submit)
         signupButton.addEventListener('click', async (e) => {
@@ -74,14 +66,6 @@
             const confirmPassword = confirmPasswordInput.value.trim();
             const role = roleSelect.value;
 
-            console.log('Nama Lengkap:', namaLengkap);
-            console.log('Username:', username);
-            console.log('No. Telepon:', telepon);
-            console.log('Email:', email);
-            console.log('Password:', password ? '*****' : '[empty]'); // Hindari log password asli
-            console.log('Confirm Password:', confirmPassword ? '*****' : '[empty]');
-            console.log('Role:', role);
-
             // 4. Validasi di sisi frontend
             if (!namaLengkap || !username || !telepon || !email || !password || !confirmPassword) {
                 alert('Semua field wajib diisi!');
@@ -95,7 +79,7 @@
                 return;
             }
 
-            if (password.length < 6) { // Contoh: minimal 6 karakter
+            if (password.length < 6) { // Password: minimal 6 karakter
                 alert('Password minimal 6 karakter!');
                 console.warn('Validation failed: Password too short.');
                 return;

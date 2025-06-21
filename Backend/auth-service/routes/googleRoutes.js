@@ -91,13 +91,13 @@ router.get('/google/callback',
 
         if (!user.isProfileComplete) {
             // Redirect ke halaman pendaftaran frontend
-            return res.redirect(`http://localhost:5500/Frontend/register2.html?userId=${user._id}&token=${token}`);
+            return res.redirect(`http://localhost:80/complete-register.html?userId=${user._id}&token=${token}`);
         } else {
             // Redirect ke halaman profil atau dashboard utama jika sudah lengkap
             if (user.role === 'Pelayan') {
-                return res.redirect(`http://localhost:5500/Frontend/dashboardpelayan.html?userId=${user._id}&token=${token}`); // Atau ke URL dashboard frontend Anda
+                return res.redirect(`http://localhost:80/dashboard-pelayan.html?userId=${user._id}&token=${token}`); // Atau ke URL dashboard frontend Anda
             } else if (user.role === 'Chef') {
-                return res.redirect(`http://localhost:5500/Frontend/dashboardchef.html?userId=${user._id}&token=${token}`); // Atau ke URL dashboard frontend Anda
+                return res.redirect(`http://localhost:80/dashboard-chef.html?userId=${user._id}&token=${token}`); // Atau ke URL dashboard frontend Anda
             }
         }
     }

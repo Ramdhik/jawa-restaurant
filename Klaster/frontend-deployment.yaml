@@ -1,0 +1,19 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend-jawa-restaurant
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: frontend-jawa-restaurant
+  template:
+    metadata:
+      labels:
+        app: frontend-jawa-restaurant
+    spec:
+      containers:
+        - name: frontend-jawa-restaurant
+          image: luviandsp/frontend-jawa-restaurant:v1
+          ports:
+            - containerPort: 80

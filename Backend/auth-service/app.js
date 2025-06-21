@@ -10,14 +10,13 @@ const app = express();
 const port = process.env.AUTH_PORT;
 
 // Middleware
-// Pastikan ini ada dan DITERAPKAN SEBELUM rute Anda
 const authCorsOptions = {
-  origin: ['http://localhost:5500', 'http://127.0.0.1:5500'], // HARUS SAMA PERSIS dengan origin frontend Anda
+  origin: ['http://localhost:5500', 'http://127.0.0.1:5500', 'http://localhost:80', 'http://127.0.0.1:80', 'http://localhost', 'http://127.0.0.1'],
   methods: ['GET', 'HEAD', 'PUT', 'PATCH', 'POST', 'DELETE'],
-  credentials: true, // SANGAT PENTING
+  credentials: true,
   optionsSuccessStatus: 204
 };
-app.use(cors(authCorsOptions)); // Terapkan middleware CORS
+app.use(cors(authCorsOptions));
 
 app.use(bodyParser.json());
 app.use(cookieParser());

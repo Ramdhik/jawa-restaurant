@@ -163,24 +163,6 @@
           console.error('User ID tidak ditemukan di URL.');
       }
 
-
-/*       async function fetchWithAuth(endpoint, options = {}) {
-        const headers = {
-            ...options.headers,
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${jwtToken}`
-        };
-        const response = await fetch(`${API_GATEWAY_URL}${endpoint}`, { ...options, headers });
-
-        if (response.status === 401 || response.status === 400) { // Token tidak valid atau kadaluarsa
-            localStorage.clear();
-            alert('Sesi Anda telah berakhir. Silakan login kembali.');
-            window.location.href = '/Frontend/loginpage.html';
-            throw new Error('Sesi tidak valid');
-        }
-        return response;
-      } */
-
       async function fetchUserData(userId) {
         try {
           const response = await fetch('http://localhost:30000/auth/users/' + userId, {
@@ -211,7 +193,7 @@
         localStorage.clear();
 
         // Arahkan pengguna ke halaman login
-        window.location.href = 'http://localhost:5500/Frontend/loginpage.html';
+        window.location.href = 'http://localhost:80/login.html';
       });
 
       // === STATE APLIKASI ===
