@@ -121,6 +121,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const chefName = document.getElementById('chef-name');
     const chefRole = document.getElementById('chef-role');
 
+    const API_GATEWAY_URL = 'http://localhost:30000';
+
     const jwtToken = localStorage.getItem('jwt');
 
         // Event Logout
@@ -151,6 +153,23 @@ document.addEventListener('DOMContentLoaded', () => {
           fetchUserData(userId);
       } else {
           console.error('User ID tidak ditemukan di URL.');
+      }
+
+      async function fetchWithAuth(endpoint, options = {}) {
+        const headers = {
+            ...options.headers,
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${jwtToken}`
+        };
+        const response = await fetch(`${API_GATEWAY_URL}${endpoint}`, { ...options, headers });
+
+        if (response.status === 401 || response.status === 400) { // Token tidak valid atau kadaluarsa
+            localStorage.clear();
+            alert('Sesi Anda telah berakhir. Silakan login kembali.');
+            window.location.href = '/Frontend/loginpage.html';
+            throw new Error('Sesi tidak valid');
+        }
+        return response;
       }
 
       async function fetchUserData(userId) {
@@ -187,7 +206,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // 1. Ambil semua data pesanan dari server
     async function fetchOrders() {
         try {
-            const response = await fetch('/chef/pesanans');
+            const response = await fetchWithAuth('/chef/pesanans');
             if (!response.ok) throw new Error('Gagal mengambil data pesanan');
             allOrders = await response.json();
             displayOrders(allOrders);
@@ -258,7 +277,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         try {
-            const response = await fetch(`/chef/pesanans/${selectedOrder._id}`, {
+            const response = await fetchWithAuth(`/chef/pesanans/${selectedOrder._id}`, {
                 method: 'PATCH',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ status: newStatus })
