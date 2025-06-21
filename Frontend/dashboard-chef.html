@@ -5,12 +5,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Dashboard Chef</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/mqtt/dist/mqtt.min.js"></script>
 </head>
 <body class="bg-gray-800">
   <div class="max-w-screen-xl mx-auto bg-white shadow-md min-h-screen flex">
-    <!-- Sidebar -->
     <div class="w-2/3 p-6 border-r">
-      <!-- Header -->
       <div class="flex items-center mb-4">
         <div class="w-12 h-12 rounded-full bg-gray-300 flex items-center justify-center text-white mr-4">
           <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -23,12 +22,9 @@
         </div>
       </div>
 
-      <!-- Section Title -->
       <h2 class="font-semibold text-gray-700 text-md mb-2">Pesanan</h2>
 
-      <!-- Orders Grid -->
       <div id="orders-grid" class="grid grid-cols-4 gap-4 mb-6">
-        <!-- Order Cards -->
         <div class="bg-gray-100 rounded p-3 text-center shadow-sm">
           <p class="font-semibold text-sm">ORD-001</p>
           <p class="text-sm text-gray-600">Meja 5</p>
@@ -63,7 +59,6 @@
         </div>
       </div>
 
-      <!-- Pagination -->
       <div class="flex justify-center gap-2">
         <button class="px-4 py-1 border rounded bg-gray-100 text-sm">Previous</button>
         <button class="px-4 py-1 border rounded bg-blue-500 text-white text-sm">1</button>
@@ -72,44 +67,50 @@
       </div>
     </div>
 
-    <!-- Order Detail -->
-    <div class="w-1/3 p-6">
-      <h2 class="text-md font-semibold text-gray-700 mb-4">Detail Pesanan</h2>
+    <div class="w-1/3 p-6 flex flex-col"> <h2 class="text-md font-semibold text-gray-700 mb-4">Detail Pesanan</h2>
 
-      <!-- Order Info -->
       <div class="flex justify-between font-semibold text-sm mb-4">
-        <p id="order-detail-id">ORD-001</p>
-        <p id="order-detail-table">Meja 5</p>
+        <p id="order-detail-id">Nomor Pesanan</p>
+        <p id="order-detail-table">Nomor Meja</p>
       </div>
 
-      <!-- Order Items -->
       <div id="order-detail-items" class="border-t pt-2 space-y-2 mb-6">
-        <div class="flex justify-between text-sm">
-          <p>Nasi Goreng</p>
-          <p>1</p>
         </div>
-        <div class="flex justify-between text-sm">
-          <p>Nasi Goreng</p>
-          <p>1</p>
-        </div>
+
+      <div class="flex flex-col space-y-2 mt-auto">
+        <button id="ready-button" class="w-full bg-blue-500 text-white py-2 rounded">Siap Disajikan</button>
+        <button id="complete-button" class="w-full bg-green-500 text-white py-2 rounded">Selesai</button>
       </div>
 
-      <!-- Action Buttons -->
-      <div class="flex justify-between space-x-2">
-        <button id="ready-button" class="w-1/2 bg-blue-500 text-white py-2 rounded">Siap Disajikan</button>
-        <button id="complete-button" class="w-1/2 bg-red-500 text-white py-2 rounded">Selesai</button>
-      </div>
-
-        <!-- Tombol Logout -->
-        <button id="logout-button" class="mt-4 bg-red-500 text-white px-4 py-2 rounded text-sm hover:bg-red-600 transition">
-          Logout
-        </button>
+      <button id="logout-button" class="w-full mt-4 bg-red-500 text-white px-4 py-2 rounded text-sm hover:bg-red-600 transition">
+        Logout
+      </button>
     </div>
   </div>
 </body>
 
 <script>
-document.addEventListener('DOMContentLoaded', () => {
+  // Setup MQTT client
+  const client = mqtt.connect('wss://broker.emqx.io:8084/mqtt');
+
+  client.on('connect', function () {
+    console.log('Connected to MQTT broker');
+  });
+
+  client.on('error', function (err) {
+    console.error('Failed to connect to MQTT broker:', err);
+  });
+
+  function sendMsg(message) {
+    if (client.connected) {
+      client.publish('jawa-restoran/buzzer', message);
+      console.log('Sent:', message);
+    } else {
+      console.error('MQTT belum connect!');
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
     // === ELEMEN DOM ===
     const ordersGrid = document.querySelector('#orders-grid');
     const orderDetailId = document.querySelector('#order-detail-id');
@@ -121,66 +122,70 @@ document.addEventListener('DOMContentLoaded', () => {
     const chefRole = document.getElementById('chef-role');
     const logoutButton = document.getElementById('logout-button');
 
-      // Dapatkan URL saat ini
-      const currentUrl = window.location.href;
+    // Dapatkan URL saat ini
+    const currentUrl = window.location.href;
 
-      // Buat objek URL dari URL saat ini
-      const url = new URL(currentUrl);
+    // Buat objek URL dari URL saat ini
+    const url = new URL(currentUrl);
 
-      // Dapatkan parameter query dari URL
-      const params = new URLSearchParams(url.search);
+    // Dapatkan parameter query dari URL
+    const params = new URLSearchParams(url.search);
 
-      // Ambil nilai
-      const tokenFromUrl = params.get('token');
-      const userIdFromUrl = params.get('userId');
+    // Ambil nilai
+    const tokenFromUrl = params.get('token');
+    const userIdFromUrl = params.get('userId');
 
-      if (tokenFromUrl && userIdFromUrl) {
-        localStorage.setItem('token', tokenFromUrl);
-        localStorage.setItem('userId', userIdFromUrl);
-      }
-
-      const jwtToken = localStorage.getItem('token');
-      const userId = localStorage.getItem('userId');
-
-      if (!jwtToken || !userId) {
-        console.error('Token atau User ID tidak ditemukan.');
-        return;
-      } else {
-        params.delete('token');
-        params.delete('userId');
-        url.search = params.toString();
-        window.history.pushState({}, '', url.href);
-      }
-
-    if (userId) {
-        fetchUserData(userId);
-    } else {
-        console.error('User ID tidak ditemukan di URL.');
+    if (tokenFromUrl && userIdFromUrl) {
+      localStorage.setItem('token', tokenFromUrl);
+      localStorage.setItem('userId', userIdFromUrl);
     }
 
-      async function fetchUserData(userId) {
-        try {
-          const response = await fetch('http://localhost:30000/auth/users/' + userId, {
-            method: 'GET',
-            headers: {
-              'Content-Type': 'application/json',
-              'Accept': 'application/json',
-              'Authorization': `Bearer ${jwtToken}`
-            },
-          });
+    const jwtToken = localStorage.getItem('token');
+    const userId = localStorage.getItem('userId');
+
+    if (!jwtToken || !userId) {
+      console.error('Token atau User ID tidak ditemukan.');
+      // Arahkan ke halaman login jika token atau userId tidak ada
+      window.location.href = 'http://localhost:80/login.html';
+      return;
+    } else {
+      params.delete('token');
+      params.delete('userId');
+      url.search = params.toString();
+      window.history.pushState({}, '', url.href);
+    }
+
+    if (userId) {
+      fetchUserData(userId);
+    } else {
+      console.error('User ID tidak ditemukan di URL.');
+    }
+
+    async function fetchUserData(userId) {
+      try {
+        const response = await fetch(`http://localhost:30000/auth/users/${userId}`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            'Authorization': `Bearer ${jwtToken}`
+          },
+        });
 
         if (!response.ok) throw new Error('Gagal mengambil data user');
 
-          const userData = await response.json();
+        const userData = await response.json();
 
-          console.log('Fetched user data:', userData);
-          
-          chefName.textContent = userData.namaLengkap;
-          chefRole.textContent = userData.role;
-        } catch (error) {
-          console.error('Error fetching user data:', error);
-        }
+        console.log('Fetched user data:', userData);
+        
+        chefName.textContent = userData.namaLengkap;
+        chefRole.textContent = userData.role;
+        // Panggil clearOrderDetail setelah data user diambil
+        clearOrderDetail(); 
+      } catch (error) {
+        console.error('Error fetching user data:', error);
       }
+    }
 
     logoutButton.addEventListener('click', () => {
       // Hapus semua data dari localStorage
@@ -198,120 +203,132 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // 1. Ambil semua data pesanan dari server
     async function fetchOrders() {
-        try {
-            const response = await fetch('http://localhost:30000/chef/pesanans', {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json',
-                    'Authorization': `Bearer ${jwtToken}`
-                },
-            }); 
-            if (!response.ok) throw new Error('Gagal mengambil data pesanan');
-            allOrders = await response.json();
-            displayOrders(allOrders);
-        } catch (error) {
-            console.error('Error fetching orders:', error);
-            ordersGrid.innerHTML = '<p class="text-red-500 col-span-4">Gagal memuat pesanan.</p>';
-        }
+      try {
+        const response = await fetch('http://localhost:30000/chef/pesanans', {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            'Authorization': `Bearer ${jwtToken}`
+          },
+        });
+        if (!response.ok) throw new Error('Gagal mengambil data pesanan');
+        allOrders = await response.json();
+        displayOrders(allOrders);
+      } catch (error) {
+        console.error('Error fetching orders:', error);
+        ordersGrid.innerHTML = '<p class="text-red-500 col-span-4">Gagal memuat pesanan.</p>';
+      }
     }
 
     // 2. Tampilkan pesanan di grid
     function displayOrders(orders) {
-        ordersGrid.innerHTML = '';
-        const ordersForChef = orders.filter(order => order.status !== 'Selesai');
+      ordersGrid.innerHTML = '';
+      const ordersForChef = orders.filter(order => order.status !== 'Selesai');
 
-        if (ordersForChef.length === 0) {
-            ordersGrid.innerHTML = '<p class="text-gray-400 col-span-4">Tidak ada pesanan untuk disiapkan.</p>';
-            return;
-        }
+      if (ordersForChef.length === 0) {
+        ordersGrid.innerHTML = '<p class="text-gray-400 col-span-4">Tidak ada pesanan untuk disiapkan.</p>';
+        return;
+      }
 
-        ordersForChef.forEach(order => {
-            const card = document.createElement('div');
-            let cardClass = 'bg-gray-100'; // Default
-            if (order.status === 'Sedang Diproses') cardClass = 'bg-blue-100';
-            if (order.status === 'Siap Disajikan') cardClass = 'bg-green-100';
+      ordersForChef.forEach(order => {
+        const card = document.createElement('div');
+        let cardClass = 'bg-gray-100'; // Default
+        if (order.status === 'Sedang Diproses') cardClass = 'bg-blue-100';
+        if (order.status === 'Siap Disajikan') cardClass = 'bg-green-100';
 
-            card.className = `${cardClass} rounded p-3 text-center shadow-sm cursor-pointer hover:shadow-md transition-shadow`;
-            card.innerHTML = `
-                <p class="font-semibold text-sm">${order.nomorPesanan}</p>
-                <p class="text-sm text-gray-600">${order.meja}</p>
-                <p class="text-xs font-bold mt-1">${order.status}</p>
-            `;
-            card.addEventListener('click', () => showOrderDetail(order._id));
-            ordersGrid.appendChild(card);
-        });
+        card.className = `${cardClass} rounded p-3 text-center shadow-sm cursor-pointer hover:shadow-md transition-shadow`;
+        card.innerHTML = `
+          <p class="font-semibold text-sm">${order.nomorPesanan}</p>
+          <p class="text-sm text-gray-600">${order.meja}</p>
+          <p class="text-xs font-bold mt-1">${order.status}</p>
+        `;
+        card.addEventListener('click', () => showOrderDetail(order._id));
+        ordersGrid.appendChild(card);
+      });
     }
 
     // 3. Tampilkan detail pesanan yang dipilih
     function showOrderDetail(orderId) {
-        selectedOrder = allOrders.find(o => o._id === orderId);
-        if (!selectedOrder) return;
+      selectedOrder = allOrders.find(o => o._id === orderId);
+      if (!selectedOrder) return;
 
-        orderDetailId.textContent = selectedOrder.nomorPesanan;
-        orderDetailTable.textContent = selectedOrder.meja;
-        orderDetailItems.innerHTML = '';
-        selectedOrder.items.forEach(item => {
-            const itemDiv = document.createElement('div');
-            itemDiv.className = 'flex justify-between text-sm';
-            itemDiv.innerHTML = `<p>${item.namaItem}</p><p>${item.kuantitas}</p>`;
-            orderDetailItems.appendChild(itemDiv);
-        });
+      orderDetailId.textContent = selectedOrder.nomorPesanan;
+      orderDetailTable.textContent = selectedOrder.meja;
+      orderDetailItems.innerHTML = ''; // Clear previous content
+      selectedOrder.items.forEach(item => {
+        const itemDiv = document.createElement('div');
+        itemDiv.className = 'flex justify-between text-sm';
+        itemDiv.innerHTML = `<p>${item.namaItem}</p><p>${item.kuantitas}</p>`;
+        orderDetailItems.appendChild(itemDiv);
+      });
 
-        // Logika untuk menampilkan tombol yang sesuai
-        readyButton.style.display = 'none';
-        completeButton.style.display = 'none';
+      // Logika untuk menampilkan tombol yang sesuai
+      readyButton.style.display = 'none';
+      completeButton.style.display = 'none';
 
-        if (selectedOrder.status === "Pending" || selectedOrder.status === "Sedang Diproses") {
-            readyButton.style.display = 'block';
-        } else if (selectedOrder.status === "Siap Disajikan") {
-            completeButton.style.display = 'block';
-        }
+      if (selectedOrder.status === "Pending" || selectedOrder.status === "Sedang Diproses") {
+        readyButton.style.display = 'block';
+      } else if (selectedOrder.status === "Siap Disajikan") {
+        completeButton.style.display = 'block';
+      }
     }
 
     // 4. Update status pesanan (generik)
     async function updateOrderStatus(newStatus) {
-        if (!selectedOrder) {
-            alert('Pilih pesanan terlebih dahulu.');
-            return;
-        }
+      if (!selectedOrder) {
+        alert('Pilih pesanan terlebih dahulu.');
+        return;
+      }
 
-        try {
-            const response = await fetch(`http://localhost:30000/chef/pesanans/${selectedOrder._id}`, {
-                method: 'PATCH',
-                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${jwtToken}` },
+      try {
+        const response = await fetch(`http://localhost:30000/chef/pesanans/${selectedOrder._id}`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${jwtToken}` },
+          body: JSON.stringify({ status: newStatus })
+        });
 
-                body: JSON.stringify({ status: newStatus })
-            });
+        if (!response.ok) throw new Error(`Gagal update status menjadi ${newStatus}`);
 
-            if (!response.ok) throw new Error(`Gagal update status menjadi ${newStatus}`);
-
-            alert(`Status pesanan ${selectedOrder.nomorPesanan} berhasil diupdate!`);
-            fetchOrders(); // Refresh daftar pesanan
-            clearOrderDetail(); // Bersihkan panel detail
-        } catch (error) {
-            console.error('Error updating status:', error);
-            alert('Gagal mengupdate status pesanan.');
-        }
+        alert(`Status pesanan ${selectedOrder.nomorPesanan} berhasil diupdate!`);
+        fetchOrders(); // Refresh daftar pesanan
+        clearOrderDetail(); // Bersihkan panel detail
+      } catch (error) {
+        console.error('Error updating status:', error);
+        alert('Gagal mengupdate status pesanan.');
+      }
     }
     
     // Fungsi untuk membersihkan panel detail
     function clearOrderDetail() {
-        orderDetailId.textContent = '...';
-        orderDetailTable.textContent = '...';
-        orderDetailItems.innerHTML = '';
-        readyButton.style.display = 'none';
-        completeButton.style.display = 'none';
-        selectedOrder = null;
+      orderDetailId.textContent = 'Nomor Pesanan';
+      orderDetailTable.textContent = 'Nomor Meja';
+      orderDetailItems.innerHTML = '<p class="text-gray-400 text-center">Pilih pesanan...</p>'; // Set default text here
+      readyButton.style.display = 'none';
+      completeButton.style.display = 'none';
+      selectedOrder = null;
     }
 
     // === INISIALISASI HALAMAN & EVENT LISTENERS ===
     fetchOrders();
 
     // Event listener untuk setiap tombol memanggil fungsi update yang sama dengan status berbeda
-    readyButton.addEventListener('click', () => updateOrderStatus('Siap Disajikan'));
-    completeButton.addEventListener('click', () => updateOrderStatus('Selesai'));
-});
+    readyButton.addEventListener('click', () => {
+      sendMsg('ON');
+      updateOrderStatus('Siap Disajikan');
+    });
+    completeButton.addEventListener('click', () => {
+      sendMsg('OFF');
+      updateOrderStatus('Selesai');
+    });
+
+    const testMqttButton = document.getElementById('test-mqtt-button');
+    if (testMqttButton) {
+      testMqttButton.addEventListener('click', () => {
+        sendMsg('Tes');
+      });
+    }
+  });
 </script>
 
 </html>
